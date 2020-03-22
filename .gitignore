@@ -7,3 +7,5 @@ places
 recentf
 straight/
 transient/
+elpa/
+.lsp-session*

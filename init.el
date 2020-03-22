@@ -1,4 +1,4 @@
-;;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
+;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
 ;;; Commentary:
 
 ;; This file bootstraps the configuration, which is divided into
@@ -21,10 +21,10 @@
  en-fonts '("Fira Mono for Powerline" 13 "Source Code Pro" 13 "Courier New" 13)
  cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
  ;; 使用主题
- theme 'doom-one-light
+ theme 'doom-nord-light
  ;; 是否启动emacs server
  server-p t
- server-socket-dir "/tmp/emacs-server/"
+ server-socket-dir "tmp/emacs-server/"
  server-name "emacs-server"
  )
 
@@ -51,6 +51,7 @@
 (defalias 'yes-or-no-p 'y-or-n-p) ;; use y/n insteal of yes/no
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(menu-bar-mode -1)
 (horizontal-scroll-bar-mode -1)
 (global-auto-revert-mode 1)
 (recentf-mode 1)
@@ -91,7 +92,7 @@
  compilation-scroll-output    t
  debug-on-error               t
  delete-old-versions          t
- gc-cons-threshold            2147483648 ; 2GB
+ gc-cons-threshold            1 * 1024 * 1024 * 1024 * 8; 1GB
  history-length               1024
  idle-update-delay            0.5
  inhibit-startup-message      t
@@ -101,6 +102,7 @@
  vc-follow-symlinks           t
  version-control              t
  visible-bell                 0
+ backup-directory-alist       `(("." . ,(concat user-emacs-directory "backups")))
  )
 
 ;;; ----------------------------------------------------------------------------
@@ -123,6 +125,13 @@
 
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
+
+;;; ----------------------------------------------------------------------------
+;;; My Functions
+
+(defun random-choice (LIST)
+  "Get a random choice from LIST"
+  (nth (mod (random) (length LIST)) LIST))
 
 ;;; ----------------------------------------------------------------------------
 ;;; Init Font
@@ -169,12 +178,56 @@
 (init-font)
 
 ;;; ----------------------------------------------------------------------------
+;;;
+;;; Theme
+
+;;; 标题栏透明
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . light))
+
+(defvar theme nil)
+
+(use-package helm-themes)
+(use-package doom-themes :defer t)
+(use-package zenburn-theme :defer t)
+(use-package dracula-theme :defer t)
+(use-package badwolf-theme :defer t)
+(use-package material-theme :defer t)
+(use-package immaterial-theme :defer t)
+(use-package github-theme :defer t)
+(use-package github-modern-theme :defer t)
+(use-package noctilux-theme :defer t)
+(use-package firecode-theme :defer t)
+(use-package apropospriate-theme :defer t)
+(use-package moe-theme :defer t)
+
+(defun random-theme ()
+  (random-choice (custom-available-themes)))
+
+(defun final-theme ()
+  (cond
+   ((eq theme nil) default) 
+   ((or (eq theme 'random) (string-equal theme "random")) (random-theme))
+  (t theme )))
+
+(defun load-theme-dwim ()
+  (interactive)
+  (let ((final-theme (final-theme)))
+    (load-theme final-theme t)
+    (message (format "load theme: %s" (symbol-name final-theme)))
+    ))
+
+(load-theme-dwim)
+
+;;; ----------------------------------------------------------------------------
 ;;; Init Packages
 (use-package evil
   :config
-  (evil-ex-define-cmd "q" 'kill-this-buffer) ;; make :q just kill buffer, do not exit emacs
+  (evil-ex-define-cmd "q"    'kill-this-buffer) ;; make :q just kill buffer, do not exit emacs
   (evil-ex-define-cmd "quit" 'evil-quit)
-  (evil-mode 1))
+  (add-hook 'prog-mode-hook        #'evil-mode)
+  (add-hook 'fundamental-mode-hook #'evil-mode)
+  (add-hook 'text-mode-hook        #'evil-mode))
 
 (use-package evil-leader
   :config
@@ -182,10 +235,12 @@
   (global-evil-leader-mode)
   )
 
+(use-package evil-surround
+  :config (global-evil-surround-mode 1))
+
 (use-package restart-emacs
   :config
   (evil-leader/set-key "qr" 'restart-emacs))
-
 
 ;; 智能括号
 (defvar smartparens-p nil)
@@ -221,12 +276,12 @@
     ))
 
 ;; 跳转
-(use-package avy
+(useg-package avy
   :init
   (evil-leader/set-key
     "SPC" 'avy-goto-word-1
-    "l" 'avy-goto-line
-    ))
+    "l" 'avy-goto-line)
+  :config (avy-setup-default))
 
 ;; helm
 (use-package helm
@@ -245,21 +300,6 @@
     "hr" 'helm-recentf
     "hk" 'helm-show-kill-ring
     ))
-
-;; default variables
-(defvar gui-theme 'wombat)
-(defvar cli-theme 'wombat)
-
-(use-package helm-themes)
-(use-package zenburn-theme :defer t)
-(use-package dracula-theme :defer t)
-(use-package doom-themes :defer t)
-
-(defvar theme nil)
-(when theme
-  (message (format "load theme %s" (symbol-name theme)))
-  (load-theme theme t)
-  )
 
 ;; 彩虹分隔符
 (use-package rainbow-delimiters
@@ -377,6 +417,8 @@ FACE defaults to inheriting from default and highlight."
 
 (use-package helm-company)
 
+(use-package helm-rg)
+
 (use-package projectile)
 
 (use-package helm-projectile
@@ -384,7 +426,7 @@ FACE defaults to inheriting from default and highlight."
   (evil-leader/set-key
     "pd" 'helm-projectile-find-dir
     "pf" 'helm-projectile-find-file-dwim
-    "pg" 'helm-projectile-grep
+    "pg" 'helm-projectile-rg
     "pp" 'helm-projectile
     "pr" 'helm-projectile-recentf
     "ps" 'projectile-run-eshell
@@ -411,7 +453,11 @@ FACE defaults to inheriting from default and highlight."
     "tt" 'treemacs-switch-window
     "tw" 'treemacs-switch-workspace
     "tp" 'treemacs-add-and-display-current-project
-    ))
+    "ta" 'treemacs-find-tag
+    )
+  (when (fboundp 'doom-themes-treemacs-config)
+    (doom-themes-treemacs-config))
+  )
 
 (defun move-to-front (list x)
   (cons x (remove x list)))
@@ -709,7 +755,7 @@ FACE defaults to inheriting from default and highlight."
 
 (defun kill-all-buffers-i ()
   (interactive)
-  (kill-buffers nil))
+  (kill-all-buffers nil))
 
 (defun switch-to-modified-buffer ()
   "Switch to modified buffer"
@@ -730,6 +776,11 @@ FACE defaults to inheriting from default and highlight."
   "Open ~/.emacs.d/init.el"
   (interactive)
   (find-file "~/.emacs.d/init.el"))
+
+(defun open-inbox ()
+  "Open ~/INBOX"
+  (interactive)
+  (find-file "~/INBOX"))
 
 (defun switch-to-scratch ()
   "Swtich to *scratch* buffer"
@@ -753,19 +804,24 @@ FACE defaults to inheriting from default and highlight."
   )
 
 (bind-keys
- ("C-j" . ace-window))
+ ("≈"       . helm-M-x)
+ ("C-j"     . ace-window)
+ ("C-x C-f" . helm-find-files)
+ )
 
 (bind-keys
  :map evil-normal-state-map
  ("J" . evil-scroll-page-down)
  ("K" . evil-scroll-page-up)
- ("U" . undo-tree-redo)
- ("gJ" . evil-join)
+ ("u" . undo-tree-redo)
+ ("gj" . evil-join)
  )
 
 (bind-keys
- :map evil-motion-state-map
- ("K" . evil-scroll-page-up))
+ :map evil-insert-state-map
+ ("C-e" . move-end-of-line)
+ ("C-a" . move-beginning-of-line)
+ )
 
 (evil-leader/set-key
   ;; file
@@ -777,6 +833,7 @@ FACE defaults to inheriting from default and highlight."
   "bd"  'kill-this-buffer
   "bD"  'kill-all-buffers-i
   "bs"  'switch-to-scratch
+  "bi"  'open-inbox
   "bm"  'switch-to-modified-buffer
 
   ;; window
@@ -792,12 +849,27 @@ FACE defaults to inheriting from default and highlight."
   "cl" 'comment-line
   "cc" 'comment-dwim
 
-  ;; move
-  "SPC"   'avy-goto-word-1
-  "l"     'avy-goto-line
-
   ;; quit
   "qq" 'save-buffers-kill-emacs
   )
 
 ;;; init.el ends here
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(helm-ff-lynx-style-map t)
+ '(helm-grep-use-ioccur-style-keys t)
+ '(helm-imenu-lynx-style-map t t)
+ '(helm-occur-use-ioccur-style-keys t)
+ '(helm-semantic-lynx-style-map t t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(hl-line ((t (:extend t)))))
