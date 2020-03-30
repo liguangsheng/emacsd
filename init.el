@@ -22,10 +22,6 @@
  cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
  ;; 使用主题
  theme 'doom-nord-light
- ;; 是否启动emacs server
- server-p t
- server-socket-dir "tmp/emacs-server/"
- server-name "emacs-server"
  )
 
 ;;; ----------------------------------------------------------------------------
@@ -182,9 +178,6 @@
 ;;; Theme
 
 ;;; 标题栏透明
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(add-to-list 'default-frame-alist '(ns-appearance . light))
-
 (defvar theme nil)
 
 (use-package helm-themes)
@@ -218,6 +211,10 @@
     ))
 
 (load-theme-dwim)
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(if (eq 'light (frame-parameter nil 'background-mode))
+    (add-to-list 'default-frame-alist '(ns-appearance . light))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
 ;;; ----------------------------------------------------------------------------
 ;;; Init Packages
@@ -276,7 +273,7 @@
     ))
 
 ;; 跳转
-(useg-package avy
+(use-package avy
   :init
   (evil-leader/set-key
     "SPC" 'avy-goto-word-1
@@ -512,8 +509,8 @@ FACE defaults to inheriting from default and highlight."
   (server-force-delete)
   (server-start))
 
-(when server-p
-  (restart-emacs-server))
+;; (when server-p
+;;   (restart-emacs-server))
 
 ;; lsp
 (use-package lsp-mode
@@ -813,7 +810,7 @@ FACE defaults to inheriting from default and highlight."
  :map evil-normal-state-map
  ("J" . evil-scroll-page-down)
  ("K" . evil-scroll-page-up)
- ("u" . undo-tree-redo)
+ ("u" . undo-tree-undo)
  ("gj" . evil-join)
  )
 
