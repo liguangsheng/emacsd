@@ -8,4 +8,5 @@ recentf
 straight/
 transient/
 elpa/
+backups/
 .lsp-session*
