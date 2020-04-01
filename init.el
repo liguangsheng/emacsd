@@ -6,9 +6,84 @@
 
 ;;; Code:
 
-;;; ---------------------------------------------------------------------------
-;;; Basic
+(setq-default
+ ;; 显示行号
+ show-line-number-p t
+ ;; 启动时窗口最大化
+ maximize-frame-at-start-p t
+ ;; 平滑滚动
+ smooth-scrolling-p t
+ ;; 自动重新加载被修改过的文件
+ auto-revert-p t
+ ;; 中英文字体
+ ;; https://github.com/powerline/fonts
+ ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
+ en-fonts '("Fira Mono for Powerline" 13 "Source Code Pro" 13 "Courier New" 13)
+ cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
+ ;; 使用主题
+ theme 'doom-nord-light
+ )
 
+;;; ----------------------------------------------------------------------------
+;;; Core
+(require 'cl-lib)
+
+(defvar emacs-root-dir (file-truename user-emacs-directory)
+  "Path to .emacs.d directory.")
+
+(defvar emacs-lisp-dir  (expand-file-name "lisp/" emacs-root-dir)
+  "Path to .emacs.d/lisp directory where init files exists.")
+
+(defvar emacs-site-lisp-dir (expand-file-name "site-lisp/" emacs-root-dir)
+  "Path to .emacs.d/site-lisp directory.")
+
+;; Add dir to load-path
+(add-to-list 'load-path emacs-lisp-dir)
+(add-to-list 'load-path emacs-site-lisp-dir)
+
+;; Recursive add site-lisp to load-path
+(let ((default-directory emacs-site-lisp-dir))
+  (normal-top-level-add-subdirs-to-load-path))
+
+;;; ---------------------------------------------------------------------------
+;;; Defaults
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+(cua-mode 1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(horizontal-scroll-bar-mode -1)
+(global-auto-revert-mode 1)
+(recentf-mode 1)
+(ignore-errors (savehist-mode 1))
+(save-place-mode 1)
+(show-paren-mode 1)
+(delete-selection-mode 1)
+(setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
+(electric-pair-mode 1)
+
+;; Show line number
+(when show-line-number-p
+  (if (fboundp 'display-line-numbers-mode)
+      (global-display-line-numbers-mode 1)
+    (global-linum-mode 1)))
+
+;; Maximize frame at start
+(defvar maximize-frame-at-start-p t "Maximize-frame-at-start-p.")
+(when maximize-frame-at-start-p (add-to-list 'initial-frame-alist '(fullscreen . maximized)))
+
+;; Use utf-8 as default coding system.
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode))               ; pretty
+(prefer-coding-system                   'utf-8)  ; pretty
+(set-terminal-coding-system             'utf-8)  ; pretty
+(set-keyboard-coding-system             'utf-8)  ; pretty
+(set-selection-coding-system            'utf-8)  ; pretty
+(setq locale-coding-system              'utf-8)  ; pretty
+(setq-default buffer-file-coding-system 'utf-8)  ; with sugar on top
+
+;; Better variables
 (setq
  apropos                      t
  backup-by-copying            t
@@ -18,7 +93,7 @@
  compilation-scroll-output    t
  debug-on-error               t
  delete-old-versions          t
- gc-cons-threshold            1 * 1024 * 1024 * 1024 * 8  ;; 1GB
+ gc-cons-threshold            1 * 1024 * 1024 * 1024 * 8; 1GB
  history-length               1024
  idle-update-delay            0.5
  inhibit-startup-message      t
@@ -28,57 +103,34 @@
  vc-follow-symlinks           t
  version-control              t
  visible-bell                 0
- backup-directory-alist       `(("." . ,(concat user-emacs-directory "backups"))))
+ backup-directory-alist       `(("." . ,(concat user-emacs-directory "backups")))
+ )
 
-(defalias 'yes-or-no-p 'y-or-n-p)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-(horizontal-scroll-bar-mode -1)
-(global-auto-revert-mode 1)
-(recentf-mode 1)
-(cua-mode 1)
-(save-place-mode 1)
-(show-paren-mode 1)
-(delete-selection-mode 1)
-(electric-pair-mode 1)
-(setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
+;;; ----------------------------------------------------------------------------
+;;; Package Manage(straight)
 
-;; coding
-(when (fboundp 'set-charset-priority)
-  (set-charset-priority 'unicode))		      
-(prefer-coding-system                   'utf-8)
-(set-terminal-coding-system		'utf-8)
-(set-keyboard-coding-system		'utf-8)
-(set-selection-coding-system		'utf-8)
-(setq locale-coding-system		'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
+(require 'package)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el"
+			 user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+	(url-retrieve-synchronously
+	 "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	 'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(setq locale-coding-system 'utf-8)
-(set-language-environment 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-buffer-file-coding-system 'utf-8)
-(set-clipboard-coding-system 'utf-8)
-(set-file-name-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-(modify-coding-system-alist 'process "*" 'utf-8)
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t
+      use-package-always-defer t
+      use-package-always-ensure nil)
 
-(require 'cl-lib)
-
-;;; ---------------------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
 ;;; My Functions
-
-(defun open-init-el ()
-  "Open ~/.emacs.d/init.el"
-  (interactive)
-  (find-file "~/.emacs.d/init.el"))
-
-(defun switch-to-scratch ()
-  "Swtich to *scratch* buffer"
-  (interactive)
-  (switch-to-buffer "*scratch*"))
 
 (defun kill-all-buffers (KILL-STARRED-BUFFER)
   "Kill all buffers."
@@ -110,48 +162,115 @@
 	(switch-to-buffer (first buf-list))
       (message "No buffer modified."))))
 
-;;; ---------------------------------------------------------------------------
-;;; Package Manage
+(defun open-init-el ()
+  "Open ~/.emacs.d/init.el"
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
 
-;; Set ELPA packages
-(setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
-                         ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
-                         ("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
-                         ("org" . "https://mirrors.ustc.edu.cn/elpa/org/")))
+(defun open-inbox ()
+  "Open ~/INBOX"
+  (interactive)
+  (find-file "~/INBOX"))
 
-;; Initialize packages
-(unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
-  (setq package-enable-at-startup nil)          ; To prevent initializing twice
-  (package-initialize))
+(defun switch-to-scratch ()
+  "Swtich to *scratch* buffer"
+  (interactive)
+  (switch-to-buffer "*scratch*"))
 
-;; Setup `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(defun random-choice (LIST)
+  "Get a random choice from LIST"
+  (nth (mod (random) (length LIST)) LIST))
 
-;; Should set before loading `use-package'
-(eval-and-compile
-  (setq use-package-always-ensure t)
-  (setq use-package-always-defer t)
-  (setq use-package-expand-minimally t)
-  (setq use-package-enable-imenu-support t))
+;;; ----------------------------------------------------------------------------
+;;; Init Font
+(defvar en-fonts '("Source Code Pro" 13 "Courier New" 13))
+(defvar cn-fonts '("宋体" 15 "微软雅黑" 15))
 
-(eval-when-compile
-  (require 'use-package))
+(defun init/exists-p (font-name)
+  "Check if font exists."
+  (if (null (x-list-fonts font-name)) nil t))
 
-;; Required by `use-package'
-(use-package diminish)
-(use-package bind-key)
+(defun init/use-en (font-name font-size)
+  "Set font for english."
+  (set-face-attribute 'default nil
+		      :font (format "%s:pixelsize=%d" font-name font-size)
+		      :weight 'normal))
 
-;; Update GPG keyring for GNU ELPA
-(use-package gnu-elpa-keyring-update)
+(defun init/use-cn (font-name font-size)
+  "Set font for chinese."
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font) charset
+		      (font-spec :family font-name :size font-size))))
 
-;;; ---------------------------------------------------------------------------
-;;; Packages Initialization
+(defun init/use-list (font-list font-func)
+  "Search font in font-list, use it if exists."
+  (unless (null font-list)
+    (let ((font-name (car font-list))
+	  (font-size (cadr font-list)))
+      (if (init/exists-p font-name)
+	  (funcall font-func font-name font-size)
+	(init/use-list (cddr font-list) font-func)))))
 
+(defun init/use-en-list (font-list)
+  (init/use-list font-list 'init/use-en))
+
+(defun init/use-cn-list (font-list)
+  (init/use-list font-list 'init/use-cn))
+
+
+(defun init-font ()
+  (when (display-graphic-p)
+    (init/use-en-list en-fonts)
+    (init/use-cn-list cn-fonts)))
+
+(init-font)
+
+;;; ----------------------------------------------------------------------------
+;;;
+;;; Theme
+
+(defvar theme 'default)
+(use-package helm-themes)
+(use-package doom-themes :defer t)
+(use-package zenburn-theme :defer t)
+(use-package dracula-theme :defer t)
+(use-package badwolf-theme :defer t)
+(use-package material-theme :defer t)
+(use-package immaterial-theme :defer t)
+(use-package github-theme :defer t)
+(use-package github-modern-theme :defer t)
+(use-package noctilux-theme :defer t)
+(use-package firecode-theme :defer t)
+(use-package apropospriate-theme :defer t)
+(use-package moe-theme :defer t)
+
+(defun random-theme ()
+  (random-choice (custom-available-themes)))
+
+(defun final-theme ()
+  (cond
+   ((eq theme nil) default) 
+   ((or (eq theme 'random) (string-equal theme "random")) (random-theme))
+   (t theme )))
+
+(defun load-theme-dwim ()
+  (interactive)
+  (let ((final-theme (final-theme)))
+    (load-theme final-theme t)
+    (message (format "load theme: %s" (symbol-name final-theme)))
+    ))
+
+(load-theme-dwim)
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(if (eq 'light (frame-parameter nil 'background-mode))
+    (add-to-list 'default-frame-alist '(ns-appearance . light))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)))
+
+;;; ----------------------------------------------------------------------------
+;;; Initilize Packages
 (use-package evil
   :config
-  (evil-ex-define-cmd "q"    'kill-this-buffer) ;; make :q just kill buffer, do not exit emacs
+  (evil-ex-define-cmd "q"    'kill-this-buffer) 
   (evil-ex-define-cmd "quit" 'evil-quit)
   (add-hook 'prog-mode-hook        #'evil-mode)
   (add-hook 'fundamental-mode-hook #'evil-mode)
@@ -160,7 +279,7 @@
 (use-package evil-leader
   :config
   (evil-leader/set-leader "<SPC>")
-  (global-evil-leader-mode))
+  (global-evil-leader-mode)  )
 
 (use-package evil-surround
   :config (global-evil-surround-mode 1))
@@ -169,22 +288,27 @@
   :config
   (evil-leader/set-key "qr" 'restart-emacs))
 
+;; 智能括号
+(defvar smartparens-p nil)
 (use-package smartparens
   :config
   (sp-with-modes
       '(c++-mode objc-mode c-mode go-mode)
     (sp-local-pair "{" nil :post-handlers '(:add ("||\n[i]" "RET")))
     (sp-local-pair "(" nil :post-handlers '(:add ("||\n[i]" "RET"))))
-  (smartparens-global-mode))
+  (when smartparens-p (smartparens-global-mode)))
 
+;; 平滑滚动屏幕
+(defvar smooth-scrolling-p nil)
 (use-package smooth-scrolling
   :init
   (setq
    smooth-scroll-margin 1
    smooth-scroll-strict-margins t)
   :config
-  (smooth-scrolling-mode 1))
+  (when smooth-scrolling-p (smooth-scrolling-mode 1)))
 
+;; 扩展选择区域
 (use-package expand-region
   :config
   (evil-leader/set-key
@@ -197,6 +321,7 @@
     "v" 'er/expand-region
     ))
 
+;; 跳转
 (use-package avy
   :init
   (evil-leader/set-key
@@ -206,7 +331,8 @@
 
 ;; helm
 (use-package helm
-  :bind ("M-x" . 'helm-M-x)
+  :bind (("M-x" . 'helm-M-x)
+	 ("C-x b" . 'helm-mini))
   :config
   (customize-set-variable 'helm-ff-lynx-style-map t)
   (customize-set-variable 'helm-imenu-lynx-style-map t)
@@ -222,27 +348,34 @@
     "hk" 'helm-show-kill-ring
     ))
 
+;; 彩虹分隔符
 (use-package rainbow-delimiters
   :config (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
+;; 高亮缩进
 (use-package highlight-indentation
   :disabled
   :config (add-hook 'prog-mode-hook #'highlight-indentation-current-column-mode))
 
+;; 高亮数字
 (use-package highlight-numbers
   :config (add-hook 'prog-mode-hook #'highlight-numbers-mode))
 
+;; 高亮TODO
 (use-package hl-todo
   :config (global-hl-todo-mode))
 
+;; 高亮symbol
 (use-package highlight-symbol
   :config (highlight-symbol-mode))
 
+;; 高亮当前行
 (use-package hl-line
   :ensure nil
   :custom-face (hl-line ((t (:extend t)))) ; FIXME: compatible with 27
   :hook (after-init . global-hl-line-mode))
 
+;; 高亮对应的paren
 (use-package paren
   :ensure nil
   :hook (after-init . show-paren-mode)
@@ -348,6 +481,7 @@ FACE defaults to inheriting from default and highlight."
 
 (use-package flycheck)
 
+;; treemacs
 (use-package treemacs
   :config
   (treemacs-resize-icons 12)
@@ -370,8 +504,8 @@ FACE defaults to inheriting from default and highlight."
     )
   (when (fboundp 'doom-themes-treemacs-config)
     (doom-themes-treemacs-config))
-  (use-package treemacs-projectile)
-  (use-package treemacs-evil)
+  ; (require 'treemacs-projectile)
+  ; (require 'treemacs-evil)
   )
 
 (defun move-to-front (list x)
@@ -383,6 +517,7 @@ FACE defaults to inheriting from default and highlight."
   (move-to-front
    (cl-loop for ws in (treemacs-workspaces) collect (treemacs-workspace->name ws))
    helm--treemacs-last-candidate))
+
 
 (defun treemacs-find-workspace (name)
   (seq-find
@@ -410,6 +545,7 @@ FACE defaults to inheriting from default and highlight."
 		   )
 	:buffer "*helm treemacs*"))
 
+
 ;; server
 (defvar server-p nil
   "Do you want start a emacs server")
@@ -422,7 +558,8 @@ FACE defaults to inheriting from default and highlight."
   (server-force-delete)
   (server-start))
 
-(restart-emacs-server)
+;; (when server-p
+;;   (restart-emacs-server))
 
 ;; lsp
 (use-package lsp-mode
@@ -618,7 +755,7 @@ FACE defaults to inheriting from default and highlight."
 (use-package govet)
 
 ;; rust
-(use-package  rust-mode
+(use-package rust-mode
   :init (setq rust-format-on-save t))
 
 (use-package rust-playground)
@@ -648,22 +785,27 @@ FACE defaults to inheriting from default and highlight."
   :config
   (which-key-mode 1))
 
-;;; ---------------------------------------------------------------------------
-;;; Keybindings
+;;; ----------------------------------------------------------------------------
+;;; My Functions
+
+;;; ----------------------------------------------------------------------------
+;;; Init Keys
+
 (which-key-add-key-based-replacements
- "SPC b" "buffer"
- "SPC c" "comment"
- "SPC e" "expand"
- "SPC f" "file"
- "SPC h" "helm"
- "SPC m" "mode"
- "SPC p" "projectile"
- "SPC q" "quit"
- "SPC t" "treemacs"
- "SPC w" "window"
- )
+  "SPC b" "buffer"
+  "SPC c" "comment"
+  "SPC e" "expand"
+  "SPC f" "file"
+  "SPC h" "helm"
+  "SPC m" "mode"
+  "SPC p" "projectile"
+  "SPC q" "quit"
+  "SPC t" "treemacs"
+  "SPC w" "window"
+  )
 
 (bind-keys
+ ("≈"       . helm-M-x)
  ("C-j"     . ace-window)
  ("C-x C-f" . helm-find-files)
  )
@@ -712,18 +854,23 @@ FACE defaults to inheriting from default and highlight."
   "qq" 'save-buffers-kill-emacs
   )
 
-;;; ---------------------------------------------------------------------------
-;;; Custom things
+;;; init.el ends here
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (ccls use-package))))
+ '(helm-ff-lynx-style-map t)
+ '(helm-grep-use-ioccur-style-keys t)
+ '(helm-imenu-lynx-style-map t t)
+ '(helm-occur-use-ioccur-style-keys t)
+ '(helm-semantic-lynx-style-map t t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
  '(hl-line ((t (:extend t)))))
