@@ -28,13 +28,13 @@
 ;;; Core
 (require 'cl-lib)
 
-(defvar emacs-root-dir (file-truename user-emacs-directory)
+(defconst emacs-root-dir (file-truename user-emacs-directory)
   "Path to .emacs.d directory.")
 
-(defvar emacs-lisp-dir  (expand-file-name "lisp/" emacs-root-dir)
+(defconst emacs-lisp-dir  (expand-file-name "lisp/" emacs-root-dir)
   "Path to .emacs.d/lisp directory where init files exists.")
 
-(defvar emacs-site-lisp-dir (expand-file-name "site-lisp/" emacs-root-dir)
+(defconst emacs-site-lisp-dir (expand-file-name "site-lisp/" emacs-root-dir)
   "Path to .emacs.d/site-lisp directory.")
 
 ;; Add dir to load-path
@@ -107,7 +107,7 @@
  )
 
 ;;; ----------------------------------------------------------------------------
-;;; Package Manage(straight)
+;;; Package Manager(straight.el)
 
 (require 'package)
 (defvar bootstrap-version)
@@ -126,7 +126,6 @@
 
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t
-      use-package-always-defer t
       use-package-always-ensure nil)
 
 ;;; ----------------------------------------------------------------------------
@@ -331,7 +330,7 @@
 
 ;; helm
 (use-package helm
-  :bind (("M-x" . 'helm-M-x)
+  :bind (("M-x"   . 'helm-M-x)
 	 ("C-x b" . 'helm-mini))
   :config
   (customize-set-variable 'helm-ff-lynx-style-map t)
