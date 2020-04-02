@@ -6,35 +6,44 @@
 
 ;;; Code:
 
+;;; ----------------------------------------------------------------------------
+;;; Quick Settings
+
 (setq-default
  ;; 显示行号
  show-line-number-p t
  ;; 启动时窗口最大化
- maximize-frame-at-start-p t
+ maximize-frame-at-start-p nil
  ;; 平滑滚动
  smooth-scrolling-p t
- ;; 自动重新加载被修改过的文件
- auto-revert-p t
  ;; 中英文字体
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
  en-fonts '("Fira Mono for Powerline" 13 "Source Code Pro" 13 "Courier New" 13)
  cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
  ;; 使用主题
- theme 'doom-nord-light
+ theme 'doom-one
  )
 
-;;; ----------------------------------------------------------------------------
+;(setq url-proxy-services 
+; '(("http"  . "127.0.0.1:1080")
+;   ("https" . "127.0.0.1:1080")))
+
+;;; ------------------------------------------------------------------------
 ;;; Core
 (require 'cl-lib)
 
-(defvar emacs-root-dir (file-truename user-emacs-directory)
+(defconst emacs/>=27p
+  (>= emacs-major-version 27)
+  "Emacs is 27 or above.")
+
+(defconst emacs-root-dir (file-truename user-emacs-directory)
   "Path to .emacs.d directory.")
 
-(defvar emacs-lisp-dir  (expand-file-name "lisp/" emacs-root-dir)
+(defconst emacs-lisp-dir  (expand-file-name "lisp/" emacs-root-dir)
   "Path to .emacs.d/lisp directory where init files exists.")
 
-(defvar emacs-site-lisp-dir (expand-file-name "site-lisp/" emacs-root-dir)
+(defconst emacs-site-lisp-dir (expand-file-name "site-lisp/" emacs-root-dir)
   "Path to .emacs.d/site-lisp directory.")
 
 ;; Add dir to load-path
@@ -45,14 +54,17 @@
 (let ((default-directory emacs-site-lisp-dir))
   (normal-top-level-add-subdirs-to-load-path))
 
-;;; ---------------------------------------------------------------------------
+;;; ------------------------------------------------------------------------
 ;;; Defaults
+
+;; Initlize Frame
+(when (and (display-graphic-p) (not (>= emacs-major-version 27))) 
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (cua-mode 1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(menu-bar-mode -1)
 (horizontal-scroll-bar-mode -1)
 (global-auto-revert-mode 1)
 (recentf-mode 1)
@@ -107,30 +119,82 @@
  )
 
 ;;; ----------------------------------------------------------------------------
-;;; Package Manage(straight)
+;;; Package Manager
 
+;; package.el
 (require 'package)
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el"
-			 user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-	(url-retrieve-synchronously
-	 "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	 'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
+                         ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
+                         ("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
+                         ("org" . "https://mirrors.ustc.edu.cn/elpa/org/")))
 
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t
-      use-package-always-defer t
-      use-package-always-ensure nil)
+;; Initialize packages
+(unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
+  (setq package-enable-at-startup nil)          ; To prevent initializing twice
+  (package-initialize))
 
-;;; ----------------------------------------------------------------------------
+;; Setup `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; Should set before loading `use-package'
+(eval-and-compile
+  (setq use-package-always-ensure t)
+  (setq use-package-always-defer t)
+  (setq use-package-expand-minimally t)
+  (setq use-package-enable-imenu-support t))
+
+(eval-when-compile
+  (require 'use-package))
+
+;; Required by `use-package'
+(use-package diminish)
+(use-package bind-key)
+
+;; Update GPG keyring for GNU ELPA
+(use-package gnu-elpa-keyring-update)
+
+;; Initialization benchmark
+(use-package benchmark-init
+  :commands (benchmark-init/activate)
+  :hook (after-init . benchmark-init/deactivate)
+  :init (benchmark-init/activate))
+
+;; A modern Packages Menu
+(use-package paradox
+  :init
+  (setq paradox-execute-asynchronously t
+        paradox-github-token t
+        paradox-display-star-count nil)
+
+  ;; Replace default `list-packages'
+  (defun my-paradox-enable (&rest _)
+    "Enable paradox, overriding the default package-menu."
+    (paradox-enable))
+  (advice-add #'list-packages :before #'my-paradox-enable)
+  :config
+  (when (fboundp 'page-break-lines-mode)
+    (add-hook 'paradox-after-execute-functions
+              (lambda (&rest _)
+                (let ((buf (get-buffer-create "*Paradox Report*"))
+                      (inhibit-read-only t))
+                  (with-current-buffer buf
+                    (page-break-lines-mode 1))))
+              t)))
+
+;; Auto update packages
+(use-package auto-package-update
+  :init
+  (setq auto-package-update-delete-old-versions t
+        auto-package-update-hide-results t)
+  (defalias 'upgrade-packages #'auto-package-update-now))
+
+;;; -----------------------------------------------------------------------
 ;;; My Functions
+
+(defun move-to-front (list x)
+  (cons x (remove x list)))
 
 (defun kill-all-buffers (KILL-STARRED-BUFFER)
   "Kill all buffers."
@@ -181,6 +245,10 @@
   "Get a random choice from LIST"
   (nth (mod (random) (length LIST)) LIST))
 
+(defun random-theme ()
+  "Return a random theme symbol"
+  (random-choice (custom-available-themes)))
+
 ;;; ----------------------------------------------------------------------------
 ;;; Init Font
 (defvar en-fonts '("Source Code Pro" 13 "Courier New" 13))
@@ -226,11 +294,9 @@
 (init-font)
 
 ;;; ----------------------------------------------------------------------------
-;;;
 ;;; Theme
 
 (defvar theme 'default)
-(use-package helm-themes)
 (use-package doom-themes :defer t)
 (use-package zenburn-theme :defer t)
 (use-package dracula-theme :defer t)
@@ -244,30 +310,27 @@
 (use-package apropospriate-theme :defer t)
 (use-package moe-theme :defer t)
 
-(defun random-theme ()
-  (random-choice (custom-available-themes)))
-
 (defun final-theme ()
   (cond
    ((eq theme nil) default) 
    ((or (eq theme 'random) (string-equal theme "random")) (random-theme))
-   (t theme )))
+   (t theme)))
 
 (defun load-theme-dwim ()
   (interactive)
   (let ((final-theme (final-theme)))
     (load-theme final-theme t)
-    (message (format "load theme: %s" (symbol-name final-theme)))
-    ))
+    (message (format "load theme: %s" (symbol-name final-theme)))))
 
-(load-theme-dwim)
+(unless (eq theme 'default)
+(load-theme-dwim))
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 (if (eq 'light (frame-parameter nil 'background-mode))
     (add-to-list 'default-frame-alist '(ns-appearance . light))
   (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
-;;; ----------------------------------------------------------------------------
-;;; Initilize Packages
+;;;; ----------------------------------------------------------------------------
+;;;; Initilize Packages
 (use-package evil
   :config
   (evil-ex-define-cmd "q"    'kill-this-buffer) 
@@ -284,8 +347,27 @@
 (use-package evil-surround
   :config (global-evil-surround-mode 1))
 
+;; helm
+(use-package helm
+  :bind (("M-x" . 'helm-M-x)
+	 ("C-x b" . 'helm-mini))
+  :init
+  (customize-set-variable 'helm-ff-lynx-style-map t)
+  (customize-set-variable 'helm-imenu-lynx-style-map t)
+  (customize-set-variable 'helm-semantic-lynx-style-map t)
+  (customize-set-variable 'helm-occur-use-ioccur-style-keys t)
+  (customize-set-variable 'helm-grep-use-ioccur-style-keys t)
+  (evil-leader/set-key
+    "bb" 'helm-mini
+    "ff" 'helm-find-files
+    "fr" 'helm-recentf
+    "hi" 'helm-imenu
+    "hr" 'helm-recentf
+    "hk" 'helm-show-kill-ring
+    ))
+
 (use-package restart-emacs
-  :config
+  :init
   (evil-leader/set-key "qr" 'restart-emacs))
 
 ;; 智能括号
@@ -310,7 +392,7 @@
 
 ;; 扩展选择区域
 (use-package expand-region
-  :config
+  :init
   (evil-leader/set-key
     "ep" 'er/mark-inside-pairs
     "eq" 'er/mark-inside-quotes
@@ -328,25 +410,6 @@
     "SPC" 'avy-goto-word-1
     "l" 'avy-goto-line)
   :config (avy-setup-default))
-
-;; helm
-(use-package helm
-  :bind (("M-x" . 'helm-M-x)
-	 ("C-x b" . 'helm-mini))
-  :config
-  (customize-set-variable 'helm-ff-lynx-style-map t)
-  (customize-set-variable 'helm-imenu-lynx-style-map t)
-  (customize-set-variable 'helm-semantic-lynx-style-map t)
-  (customize-set-variable 'helm-occur-use-ioccur-style-keys t)
-  (customize-set-variable 'helm-grep-use-ioccur-style-keys t)
-  (evil-leader/set-key
-    "bb" 'helm-mini
-    "ff" 'helm-find-files
-    "fr" 'helm-recentf
-    "hi" 'helm-imenu
-    "hr" 'helm-recentf
-    "hk" 'helm-show-kill-ring
-    ))
 
 ;; 彩虹分隔符
 (use-package rainbow-delimiters
@@ -431,13 +494,13 @@ FACE defaults to inheriting from default and highlight."
     (exec-path-from-shell-initialize)))
 
 (use-package doom-modeline
-  :init (setq doom-modeline-height 25
+  :init (doom-modeline-mode 1)
+  :config (setq doom-modeline-height 25
 	      doom-modeline-bar 3
 	      doom-modeline-buffer-file-name-style 'relative-to-project
 	      doom-modeline-icon t
 	      doom-modeline-major-mode-icon t
-	      )
-  :config (doom-modeline-mode 1))
+	      ))
 
 (use-package yasnippet
   :config
@@ -469,7 +532,7 @@ FACE defaults to inheriting from default and highlight."
 (use-package projectile)
 
 (use-package helm-projectile
-  :config
+  :init
   (evil-leader/set-key
     "pd" 'helm-projectile-find-dir
     "pf" 'helm-projectile-find-file-dwim
@@ -483,7 +546,7 @@ FACE defaults to inheriting from default and highlight."
 
 ;; treemacs
 (use-package treemacs
-  :config
+  :init
   (treemacs-resize-icons 12)
   (defun treemacs-switch-window ()
     (interactive)
@@ -507,9 +570,6 @@ FACE defaults to inheriting from default and highlight."
   ; (require 'treemacs-projectile)
   ; (require 'treemacs-evil)
   )
-
-(defun move-to-front (list x)
-  (cons x (remove x list)))
 
 (setq helm--treemacs-last-candidate "Default")
 
@@ -624,9 +684,6 @@ FACE defaults to inheriting from default and highlight."
 ;; org-mode
 (use-package org-bullets
   :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(use-package ox-reveal)
-(use-package org-re-reveal)
 
 ;; markdown
 (use-package markdown-mode
@@ -854,23 +911,9 @@ FACE defaults to inheriting from default and highlight."
   "qq" 'save-buffers-kill-emacs
   )
 
+;; Load custom file
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-readable-p custom-file) (load custom-file))
+
 ;;; init.el ends here
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(helm-ff-lynx-style-map t)
- '(helm-grep-use-ioccur-style-keys t)
- '(helm-imenu-lynx-style-map t t)
- '(helm-occur-use-ioccur-style-keys t)
- '(helm-semantic-lynx-style-map t t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
- '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
- '(hl-line ((t (:extend t)))))
