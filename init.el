@@ -26,9 +26,10 @@
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		      ("https" . "127.0.0.1:1080")))
+ )
 
-;;; ----------------------------------------------------------------------------
-;;; Core
+;; ----------------------------------------------------------------------------
+;;; Basic
 (require 'cl-lib)
 
 (defconst emacs/>=27p
@@ -52,19 +53,74 @@
 (let ((default-directory emacs-site-lisp-dir))
   (normal-top-level-add-subdirs-to-load-path))
 
+;;; -----------------------------------------------------------------------
+;;; My Functions
+
+(defun move-to-front (list x)
+  (cons x (remove x list)))
+
+(defun kill-all-buffers (KILL-STARRED-BUFFER)
+  "Kill all buffers."
+  (dolist (buffer (buffer-list))
+    (let ((bname (string-trim (buffer-name buffer))))
+      (if (and (not KILL-STARRED-BUFFER)
+	       (string-prefix-p "*" bname)
+	       (string-suffix-p "*" bname))
+	  nil
+	(kill-buffer-if-not-modified buffer)
+	))))
+
+(defun kill-all-buffers-i ()
+  (interactive)
+  (kill-all-buffers nil))
+
+(defun switch-to-modified-buffer ()
+  "Switch to modified buffer"
+  (interactive)
+  (let ((buf-list (seq-filter (lambda (x)
+				(not
+				 (or
+				  (not (buffer-modified-p x))
+				  (s-prefix? "*" (buffer-name x))
+				  (s-prefix? " *" (buffer-name x))
+				  (s-suffix? "-mode" (buffer-name x)))))
+			      (buffer-list))))
+    (if buf-list
+	(switch-to-buffer (first buf-list))
+      (message "No buffer modified."))))
+
+(defun open-init-el ()
+  "Open ~/.emacs.d/init.el"
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
+
+(defun open-inbox ()
+  "Open ~/INBOX"
+  (interactive)
+  (find-file "~/INBOX"))
+
+(defun switch-to-scratch ()
+  "Swtich to *scratch* buffer"
+  (interactive)
+  (switch-to-buffer "*scratch*"))
+
+(defun random-choice (LIST)
+  "Get a random choice from LIST"
+  (nth (mod (random) (length LIST)) LIST))
+
+(defun random-theme ()
+  "Return a random theme symbol"
+  (random-choice (custom-available-themes)))
+
 ;;; ------------------------------------------------------------------------
 ;;; Defaults
 
 ;; Initlize Frame
-(when (and (display-graphic-p) (not (>= emacs-major-version 27))) 
+(when (not (>= emacs-major-version 27))
   (tool-bar-mode -1)
   (menu-bar-mode -1)
-  (scroll-bar-mode -1))
-
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(if (eq 'light (frame-parameter nil 'background-mode))
-    (add-to-list 'default-frame-alist '(ns-appearance . light))
-  (add-to-list 'default-frame-alist '(ns-appearance . dark)))
+  (scroll-bar-mode -1)
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (cua-mode 1)
@@ -108,7 +164,6 @@
  compilation-scroll-output    t
  debug-on-error               t
  delete-old-versions          t
- gc-cons-threshold            1 * 1024 * 1024 * 1024 * 8; 1GB
  history-length               1024
  idle-update-delay            0.5
  inhibit-startup-message      t
@@ -120,6 +175,10 @@
  visible-bell                 0
  backup-directory-alist       `(("." . ,(concat user-emacs-directory "backups")))
  )
+
+(add-hook 'after-init-hook
+	  (lambda ()
+	    (setq gc-cons-threshold (* 1 1024 1024 1024 8)))) ;; 1GB
 
 ;;; ----------------------------------------------------------------------------
 ;;; Package Manager
@@ -192,65 +251,6 @@
   (setq auto-package-update-delete-old-versions t
 	auto-package-update-hide-results t)
   (defalias 'upgrade-packages #'auto-package-update-now))
-
-;;; -----------------------------------------------------------------------
-;;; My Functions
-
-(defun move-to-front (list x)
-  (cons x (remove x list)))
-
-(defun kill-all-buffers (KILL-STARRED-BUFFER)
-  "Kill all buffers."
-  (dolist (buffer (buffer-list))
-    (let ((bname (string-trim (buffer-name buffer))))
-      (if (and (not KILL-STARRED-BUFFER)
-	       (string-prefix-p "*" bname)
-	       (string-suffix-p "*" bname))
-	  nil
-	(kill-buffer-if-not-modified buffer)
-	))))
-
-(defun kill-all-buffers-i ()
-  (interactive)
-  (kill-all-buffers nil))
-
-(defun switch-to-modified-buffer ()
-  "Switch to modified buffer"
-  (interactive)
-  (let ((buf-list (seq-filter (lambda (x)
-				(not
-				 (or
-				  (not (buffer-modified-p x))
-				  (s-prefix? "*" (buffer-name x))
-				  (s-prefix? " *" (buffer-name x))
-				  (s-suffix? "-mode" (buffer-name x)))))
-			      (buffer-list))))
-    (if buf-list
-	(switch-to-buffer (first buf-list))
-      (message "No buffer modified."))))
-
-(defun open-init-el ()
-  "Open ~/.emacs.d/init.el"
-  (interactive)
-  (find-file "~/.emacs.d/init.el"))
-
-(defun open-inbox ()
-  "Open ~/INBOX"
-  (interactive)
-  (find-file "~/INBOX"))
-
-(defun switch-to-scratch ()
-  "Swtich to *scratch* buffer"
-  (interactive)
-  (switch-to-buffer "*scratch*"))
-
-(defun random-choice (LIST)
-  "Get a random choice from LIST"
-  (nth (mod (random) (length LIST)) LIST))
-
-(defun random-theme ()
-  "Return a random theme symbol"
-  (random-choice (custom-available-themes)))
 
 ;;; ----------------------------------------------------------------------------
 ;;; Init Font
@@ -327,10 +327,6 @@
 
 (unless (eq theme 'default)
   (load-theme-dwim))
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(if (eq 'light (frame-parameter nil 'background-mode))
-    (add-to-list 'default-frame-alist '(ns-appearance . light))
-  (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
 ;;;; ----------------------------------------------------------------------------
 ;;;; Initilize Packages
@@ -513,6 +509,7 @@ FACE defaults to inheriting from default and highlight."
   (yas-global-mode 1))
 
 (use-package company
+  :defer nil
   :config
   (setq company-tooltip-align-annotations t ; aligns annotation to the right
 	company-tooltip-limit 24            ; bigger popup window
