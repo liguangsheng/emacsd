@@ -13,7 +13,7 @@
  ;; 显示行号
  show-line-number-p t
  ;; 启动时窗口最大化
- maximize-frame-at-start-p nil
+ maximize-frame-at-start-p t
  ;; 平滑滚动
  smooth-scrolling-p t
  ;; 中英文字体
@@ -23,13 +23,11 @@
  cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
  ;; 使用主题
  theme 'doom-one
- )
+ ;; Proxy
+ ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
+ ;; 		      ("https" . "127.0.0.1:1080")))
 
-;(setq url-proxy-services 
-; '(("http"  . "127.0.0.1:1080")
-;   ("https" . "127.0.0.1:1080")))
-
-;;; ------------------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
 ;;; Core
 (require 'cl-lib)
 
@@ -62,6 +60,11 @@
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1))
+
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(if (eq 'light (frame-parameter nil 'background-mode))
+    (add-to-list 'default-frame-alist '(ns-appearance . light))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (cua-mode 1)
@@ -124,9 +127,9 @@
 ;; package.el
 (require 'package)
 (setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
-                         ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
-                         ("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
-                         ("org" . "https://mirrors.ustc.edu.cn/elpa/org/")))
+			 ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
+			 ("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
+			 ("org" . "https://mirrors.ustc.edu.cn/elpa/org/")))
 
 ;; Initialize packages
 (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
@@ -165,8 +168,8 @@
 (use-package paradox
   :init
   (setq paradox-execute-asynchronously t
-        paradox-github-token t
-        paradox-display-star-count nil)
+	paradox-github-token t
+	paradox-display-star-count nil)
 
   ;; Replace default `list-packages'
   (defun my-paradox-enable (&rest _)
@@ -176,18 +179,18 @@
   :config
   (when (fboundp 'page-break-lines-mode)
     (add-hook 'paradox-after-execute-functions
-              (lambda (&rest _)
-                (let ((buf (get-buffer-create "*Paradox Report*"))
-                      (inhibit-read-only t))
-                  (with-current-buffer buf
-                    (page-break-lines-mode 1))))
-              t)))
+	      (lambda (&rest _)
+		(let ((buf (get-buffer-create "*Paradox Report*"))
+		      (inhibit-read-only t))
+		  (with-current-buffer buf
+		    (page-break-lines-mode 1))))
+	      t)))
 
 ;; Auto update packages
 (use-package auto-package-update
   :init
   (setq auto-package-update-delete-old-versions t
-        auto-package-update-hide-results t)
+	auto-package-update-hide-results t)
   (defalias 'upgrade-packages #'auto-package-update-now))
 
 ;;; -----------------------------------------------------------------------
@@ -323,7 +326,7 @@
     (message (format "load theme: %s" (symbol-name final-theme)))))
 
 (unless (eq theme 'default)
-(load-theme-dwim))
+  (load-theme-dwim))
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 (if (eq 'light (frame-parameter nil 'background-mode))
     (add-to-list 'default-frame-alist '(ns-appearance . light))
@@ -333,7 +336,7 @@
 ;;;; Initilize Packages
 (use-package evil
   :config
-  (evil-ex-define-cmd "q"    'kill-this-buffer) 
+  (evil-ex-define-cmd "q"    'kill-this-buffer)
   (evil-ex-define-cmd "quit" 'evil-quit)
   (add-hook 'prog-mode-hook        #'evil-mode)
   (add-hook 'fundamental-mode-hook #'evil-mode)
@@ -366,6 +369,8 @@
     "hk" 'helm-show-kill-ring
     ))
 
+(use-package helm-themes)
+
 (use-package restart-emacs
   :init
   (evil-leader/set-key "qr" 'restart-emacs))
@@ -375,9 +380,9 @@
 (use-package smartparens
   :config
   (sp-with-modes
-      '(c++-mode objc-mode c-mode go-mode)
-    (sp-local-pair "{" nil :post-handlers '(:add ("||\n[i]" "RET")))
-    (sp-local-pair "(" nil :post-handlers '(:add ("||\n[i]" "RET"))))
+   '(c++-mode objc-mode c-mode go-mode)
+   (sp-local-pair "{" nil :post-handlers '(:add ("||\n[i]" "RET")))
+   (sp-local-pair "(" nil :post-handlers '(:add ("||\n[i]" "RET"))))
   (when smartparens-p (smartparens-global-mode)))
 
 ;; 平滑滚动屏幕
@@ -496,11 +501,11 @@ FACE defaults to inheriting from default and highlight."
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config (setq doom-modeline-height 25
-	      doom-modeline-bar 3
-	      doom-modeline-buffer-file-name-style 'relative-to-project
-	      doom-modeline-icon t
-	      doom-modeline-major-mode-icon t
-	      ))
+		doom-modeline-bar 3
+		doom-modeline-buffer-file-name-style 'relative-to-project
+		doom-modeline-icon t
+		doom-modeline-major-mode-icon t
+		))
 
 (use-package yasnippet
   :config
@@ -567,8 +572,8 @@ FACE defaults to inheriting from default and highlight."
     )
   (when (fboundp 'doom-themes-treemacs-config)
     (doom-themes-treemacs-config))
-  ; (require 'treemacs-projectile)
-  ; (require 'treemacs-evil)
+					; (require 'treemacs-projectile)
+					; (require 'treemacs-evil)
   )
 
 (setq helm--treemacs-last-candidate "Default")
@@ -843,10 +848,7 @@ FACE defaults to inheriting from default and highlight."
   (which-key-mode 1))
 
 ;;; ----------------------------------------------------------------------------
-;;; My Functions
-
-;;; ----------------------------------------------------------------------------
-;;; Init Keys
+;;; Keybindings
 
 (which-key-add-key-based-replacements
   "SPC b" "buffer"
