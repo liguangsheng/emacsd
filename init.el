@@ -154,6 +154,12 @@
 (setq locale-coding-system              'utf-8)  ; pretty
 (setq-default buffer-file-coding-system 'utf-8)  ; with sugar on top
 
+;; Chinese encoding for windows
+(when (eq system-type 'windows-nt)
+  (set-next-selection-coding-system 'utf-16-le)
+  (set-selection-coding-system 'utf-16-le)
+  (set-clipboard-coding-system 'utf-16-le))
+
 ;; Better variables
 (setq
  apropos                      t
