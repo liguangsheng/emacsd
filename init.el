@@ -141,9 +141,9 @@
 
 ;; Show line number
 (when show-line-number-p
-  (if (fboundp 'display-line-numbers-mode)
-      (global-display-line-numbers-mode 1)
-    (global-linum-mode 1)))
+  (add-hook 'prog-mode-hook        #'display-line-numbers-mode)
+  (add-hook 'fundamental-mode-hook #'display-line-numbers-mode)
+  (add-hook 'text-mode-hook        #'display-line-numbers-mode))
 
 ;; Maximize frame at start
 (defvar maximize-frame-at-start-p t "Maximize-frame-at-start-p.")
@@ -613,12 +613,12 @@ FACE defaults to inheriting from default and highlight."
 (defun helm-treemacs-workspace ()
   (interactive)
   (helm :sources (helm-build-sync-source "Helm-Treemacs"
-		   :candidates (helm--treemacs-workspace-candidates)
-		   :fuzzy-match t
-		   :action (lambda (candidate)
-			     (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
-			     (treemacs-select-workspace-by-name candidate))
-		   )
+					 :candidates (helm--treemacs-workspace-candidates)
+					 :fuzzy-match t
+					 :action (lambda (candidate)
+						   (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
+						   (treemacs-select-workspace-by-name candidate))
+					 )
 	:buffer "*helm treemacs*"))
 
 
@@ -728,44 +728,42 @@ FACE defaults to inheriting from default and highlight."
 ;; go
 (use-package go-mode
   :init
-  ;; 环境变量
+  ;; Copy system environment variables
   (when (memq window-system '(mac ns x))
     (dolist (var '("GOPATH" "GO15VENDOREXPERIMENT"))
       (unless (getenv var)
 	(exec-path-from-shell-copy-env var))))
-
+  :hook (go-mode . go-mode-hook-func)
+  :bind (:map go-mode-map
+	      ("C-c d d" . godef-describe)
+	      ("C-c d p" . godoc-at-point)
+	      ("C-c r u" . go-remove-unused-imports))
   :config
   ;; 寻找goretuens作为格式化工具
   ;; go get -u -v github.com/sqs/goreturns
   (when (executable-find "goreturns")
     (setq gofmt-command "goreturns"))
 
-  (add-hook 'go-mode-hook
-	    (lambda ()
-	      ;; 保存buffer之前格式化文件
-	      (add-hook 'before-save-hook 'gofmt-before-save t)
+  (defun go-mode-hook-func ()
+    ;; 保存buffer之前格式化文件
+    (add-hook 'before-save-hook 'gofmt-before-save t)
 
-	      ;; eyes and hands comfort
-	      (subword-mode 1)
-	      (setq tab-width 4)
-	      (setq indent-tabs-mode 1)
+    ;; Go support for lsp-mode using Sourcegraph's Go Language Server
+    ;; go get -u -v github.com/sourcegraph/go-langserver
+    (require 'lsp-go)
 
-	      (evil-leader/set-key
-		"mdd" 'godef-describe)
+    ;; eyes and hands comfort
+    (subword-mode 1)
+    (setq tab-width 4)
+    (setq indent-tabs-mode 1)
 
-	      (bind-key "s-]" 'godef-jump go-mode-map)
-	      (bind-key "s-[" 'pop-tag-mark go-mode-map)
+    (evil-leader/set-key
+      "mdd" 'godef-describe
+      "mdp" 'godoc-at-point
+      "mru" 'go-remove-unused-imports)
 
-	      ;; Go support for lsp-mode using Sourcegraph's Go Language Server
-	      ;; go get -u -v github.com/sourcegraph/go-langserver
-	      (require 'lsp-go)
-	      ))
-
-  :bind (:map go-mode-map
-	      ("s-[" . xref-find-definitions)
-	      ("s-]" . xref-find-references)
-	      )
-  )
+    (bind-key "s-]" 'godef-jump go-mode-map)
+    (bind-key "s-[" 'pop-tag-mark go-mode-map)))
 
 (use-package flycheck-golangci-lint
   :if (executable-find "golangci-lint")
@@ -861,41 +859,41 @@ FACE defaults to inheriting from default and highlight."
 ;;; ----------------------------------------------------------------------------
 ;;; Keybindings
 
-(which-key-add-key-based-replacements
-  "SPC b" "buffer"
-  "SPC c" "comment"
-  "SPC e" "expand"
-  "SPC f" "file"
-  "SPC h" "helm"
-  "SPC m" "mode"
-  "SPC p" "projectile"
-  "SPC q" "quit"
-  "SPC t" "treemacs"
-  "SPC w" "window"
-  )
+(when (fboundp 'which-key-add-key-based-replacements)
+  (which-key-add-key-based-replacements
+    "SPC b" "buffer"
+    "SPC c" "comment"
+    "SPC e" "expand"
+    "SPC f" "file"
+    "SPC h" "helm"
+    "SPC m" "mode"
+    "SPC p" "projectile"
+    "SPC q" "quit"
+    "SPC t" "treemacs"
+    "SPC w" "window"
+    ))
 
-(bind-keys
- ("≈"       . helm-M-x)
- ("C-j"     . ace-window)
- ("C-x C-f" . helm-find-files)
- ("M-s-l"   . indent-whole-buffer)
- ("s-/"     . comment-line)
- )
+(when (fboundp 'bind-keys)
+  (bind-keys
+   ("≈"       . helm-M-x)
+   ("C-j"     . ace-window)
+   ("C-x C-f" . helm-find-files)
+   ("M-s-l"   . indent-whole-buffer)
+   ("s-/"     . comment-line))
 
-(bind-keys
- :map evil-normal-state-map
- ("J"  . evil-scroll-page-down)
- ("K"  . evil-scroll-page-up)
- ("u"  . undo-tree-undo)
- ("U"  . undo-tree-redo)
- ("gj" . evil-join)
- )
+  (bind-keys
+   :map evil-normal-state-map
+   ("J"  . evil-scroll-page-down)
+   ("K"  . evil-scroll-page-up)
+   ("u"  . undo-tree-undo)
+   ("U"  . undo-tree-redo)
+   ("gj" . evil-join))
 
-(bind-keys
- :map evil-insert-state-map
- ("C-e" . move-end-of-line)
- ("C-a" . move-beginning-of-line)
- )
+  (bind-keys
+   :map evil-insert-state-map
+   ("C-e" . move-end-of-line)
+   ("C-a" . move-beginning-of-line)
+   ))
 
 (when (fboundp 'evil-leader/set-key)
   (evil-leader/set-key
