@@ -789,9 +789,6 @@ FACE defaults to inheriting from default and highlight."
   :bind (:map go-mode-map
 	      ("C-c C-t" . go-gen-test-dwim)))
 
-;; (use-package go-eldoc
-;;   :hook (go-mode . go-eldoc-setup))
-
 (use-package go-guru
   :bind (:map go-mode-map
 	      ([remap xref-find-definitions] . go-guru-definition)
