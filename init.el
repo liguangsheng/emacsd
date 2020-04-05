@@ -28,33 +28,24 @@
  ;; 		      ("https" . "127.0.0.1:1080")))
  )
 
-;; ----------------------------------------------------------------------------
-;;; Basic
-(require 'cl-lib)
-
-(defconst emacs/>=27p
-  (>= emacs-major-version 27)
-  "Emacs is 27 or above.")
-
-(defconst emacs-root-dir (file-truename user-emacs-directory)
-  "Path to .emacs.d directory.")
-
-(defconst emacs-lisp-dir  (expand-file-name "lisp/" emacs-root-dir)
+(defconst user-emacs-lisp-directory  (expand-file-name "lisp/" user-emacs-directory)
   "Path to .emacs.d/lisp directory where init files exists.")
 
-(defconst emacs-site-lisp-dir (expand-file-name "site-lisp/" emacs-root-dir)
+(defconst user-emacs-site-lisp-directory (expand-file-name "site-lisp/" user-emacs-directory)
   "Path to .emacs.d/site-lisp directory.")
 
 ;; Add dir to load-path
-(add-to-list 'load-path emacs-lisp-dir)
-(add-to-list 'load-path emacs-site-lisp-dir)
+(add-to-list 'load-path user-emacs-lisp-directory)
+(add-to-list 'load-path user-emacs-site-lisp-directory)
 
 ;; Recursive add site-lisp to load-path
-(let ((default-directory emacs-site-lisp-dir))
+(let ((default-directory user-emacs-site-lisp-directory))
   (normal-top-level-add-subdirs-to-load-path))
 
 ;;; -----------------------------------------------------------------------
 ;;; My Functions
+
+(require 'cl-lib)
 
 (defun indent-whole-buffer ()
   (interactive)
@@ -118,10 +109,12 @@
   (random-choice (custom-available-themes)))
 
 ;;; ------------------------------------------------------------------------
-;;; Defaults
+;;; Basic
 
 ;; Initlize Frame
-(when (not (>= emacs-major-version 27))
+;; After emacs 27.0, use `early-init-file' initlize frame
+;; Before emacs 27.0, use this
+(when (< emacs-major-version 27))
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
@@ -634,8 +627,8 @@ FACE defaults to inheriting from default and highlight."
   (server-force-delete)
   (server-start))
 
-;; (when server-p
-;;   (restart-emacs-server))
+(when server-p
+  (restart-emacs-server))
 
 ;; lsp
 (use-package lsp-mode
