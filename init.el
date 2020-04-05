@@ -334,6 +334,8 @@
 
 ;;;; ----------------------------------------------------------------------------
 ;;;; Initilize Packages
+(use-package shut-up)
+
 (use-package evil
   :config
   (evil-ex-define-cmd "q"    'kill-this-buffer)
@@ -513,7 +515,7 @@ FACE defaults to inheriting from default and highlight."
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-  (yas-global-mode 1))
+  (shut-up (yas-global-mode 1)))
 
 (use-package company
   :defer nil
