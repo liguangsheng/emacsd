@@ -114,7 +114,7 @@
 ;; Initlize Frame
 ;; After emacs 27.0, use `early-init-file' initlize frame
 ;; Before emacs 27.0, use this
-(when (< emacs-major-version 27))
+(when (< emacs-major-version 27)
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
@@ -606,12 +606,12 @@ FACE defaults to inheriting from default and highlight."
 (defun helm-treemacs-workspace ()
   (interactive)
   (helm :sources (helm-build-sync-source "Helm-Treemacs"
-					 :candidates (helm--treemacs-workspace-candidates)
-					 :fuzzy-match t
-					 :action (lambda (candidate)
-						   (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
-						   (treemacs-select-workspace-by-name candidate))
-					 )
+		   :candidates (helm--treemacs-workspace-candidates)
+		   :fuzzy-match t
+		   :action (lambda (candidate)
+			     (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
+			     (treemacs-select-workspace-by-name candidate))
+		   )
 	:buffer "*helm treemacs*"))
 
 
