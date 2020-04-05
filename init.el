@@ -583,8 +583,8 @@ FACE defaults to inheriting from default and highlight."
     )
   (when (fboundp 'doom-themes-treemacs-config)
     (doom-themes-treemacs-config))
-					; (require 'treemacs-projectile)
-					; (require 'treemacs-evil)
+  (use-package treemacs-projectile)
+  (use-package treemacs-evil)
   )
 
 (setq helm--treemacs-last-candidate "Default")
