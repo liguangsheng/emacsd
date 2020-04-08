@@ -26,6 +26,7 @@
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		      ("https" . "127.0.0.1:1080")))
+ server-p t
  )
 
 (defconst user-emacs-lisp-directory  (expand-file-name "lisp/" user-emacs-directory)
@@ -423,12 +424,12 @@
 
 ;; 彩虹分隔符
 (use-package rainbow-delimiters
-  :config (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 
 ;; 高亮缩进
 (use-package highlight-indentation
-  :disabled
-  :config (add-hook 'prog-mode-hook #'highlight-indentation-current-column-mode))
+  ;; :disabled
+  :init (add-hook 'prog-mode-hook #'highlight-indentation-current-column-mode))
 
 ;; 高亮数字
 (use-package highlight-numbers
@@ -436,11 +437,11 @@
 
 ;; 高亮TODO
 (use-package hl-todo
-  :config (global-hl-todo-mode))
+  :init (global-hl-todo-mode))
 
 ;; 高亮symbol
 (use-package highlight-symbol
-  :config (highlight-symbol-mode))
+  :init (highlight-symbol-mode))
 
 ;; 高亮当前行
 (use-package hl-line
