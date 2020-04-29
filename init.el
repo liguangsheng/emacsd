@@ -679,10 +679,6 @@ FACE defaults to inheriting from default and highlight."
 		      ".ccls")
 		    projectile-project-root-files-top-down-recurring))))
 
-  ;; python-mode
-  (add-hook 'python-mode 'lsp)
-  (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
-
   )
 
 
@@ -724,7 +720,7 @@ FACE defaults to inheriting from default and highlight."
 (use-package json-mode
   :mode (("\\.json\\'" . json-mode)))
 
-;; go
+;;; Golang:
 (use-package go-mode
   :init
   ;; Copy system environment variables
@@ -761,8 +757,9 @@ FACE defaults to inheriting from default and highlight."
       "mdp" 'godoc-at-point
       "mru" 'go-remove-unused-imports)
 
-    (bind-key "s-]" 'godef-jump go-mode-map)
-    (bind-key "s-[" 'pop-tag-mark go-mode-map)))
+    ;; (bind-key "s-]" 'godef-jump go-mode-map)
+    ;; (bind-key "s-[" 'pop-tag-mark go-mode-map)
+    ))
 
 (use-package flycheck-golangci-lint
   :if (executable-find "golangci-lint")
@@ -822,9 +819,9 @@ FACE defaults to inheriting from default and highlight."
 (use-package govet)
 
 ;;; Rust: 
-;; install rust-analyzer
-;; curl -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-linux -o ~/.local/bin/rust-analyzer
-;; chmod +x ~/.local/bin/rust-analyzer
+;; Installation:
+;;   curl -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-mac -o ~/.local/bin/rust-analyzer
+;;   chmod +x ~/.local/bin/rust-analyzer
 (use-package rust-mode
   :init (setq rust-format-on-save t
 	      lsp-rust-server 'rust-analyzer)
@@ -843,6 +840,15 @@ FACE defaults to inheriting from default and highlight."
     :config
     (add-to-list 'company-backends 'company-racer)))
 
+;;; Python:
+;; Installation:
+;;   pip3 install python-language-server[all]
+(use-package python-mode
+  :init
+  (add-hook 'python-mode 'lsp)
+  (when (executable-find "python3")
+    (setq python-shell-interpreter "python3"))
+  (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/")))
 
 ;;; Lua: 
 (use-package lua-mode
