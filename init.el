@@ -338,12 +338,13 @@
 (use-package shut-up)
 
 (use-package evil
-  :config
-  (evil-ex-define-cmd "q"    'kill-this-buffer)
-  (evil-ex-define-cmd "quit" 'evil-quit)
+  :init
   (add-hook 'prog-mode-hook        #'evil-mode)
   (add-hook 'fundamental-mode-hook #'evil-mode)
-  (add-hook 'text-mode-hook        #'evil-mode))
+  (add-hook 'text-mode-hook        #'evil-mode)
+  :config
+  (evil-ex-define-cmd "q"    'kill-this-buffer)
+  (evil-ex-define-cmd "quit" 'evil-quit))
 
 (use-package evil-leader
   :config
@@ -513,6 +514,10 @@ FACE defaults to inheriting from default and highlight."
 		doom-modeline-major-mode-icon t
 		))
 
+(use-package vi-tilde-fringe
+  :config
+  (global-vi-tilde-fringe-mode))
+
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
@@ -659,6 +664,7 @@ FACE defaults to inheriting from default and highlight."
 	lsp-inhibit-message t
 	lsp-message-project-root-warning t
 	create-lockfiles nil)
+
   :config
   ;; Restart server/workspace in case the lsp server exits unexpectedly.
   ;; https://emacs-china.org/t/topic/6392
@@ -669,7 +675,15 @@ FACE defaults to inheriting from default and highlight."
     (revert-buffer t t)
     (message "LSP server restarted."))
 
-  (require 'lsp-clients))
+  (require 'lsp-clients)
+
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+    (setq lsp-diagnostics-modeline-scope :project)
+    (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode))
+
+  (use-package lsp-treemacs)
+  )
 
 (use-package company-lsp
   :init (setq company-lsp-cache-candidates 'auto))
@@ -845,6 +859,10 @@ FACE defaults to inheriting from default and highlight."
 		    ".ccls")
 		  projectile-project-root-files-top-down-recurring))))
 
+;;; Ruby:
+;; Installation:
+;;   gem install solargraph
+(use-package ruby-mode)
 
 ;;; Lua: 
 (use-package lua-mode
