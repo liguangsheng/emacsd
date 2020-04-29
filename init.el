@@ -592,7 +592,6 @@ FACE defaults to inheriting from default and highlight."
    (cl-loop for ws in (treemacs-workspaces) collect (treemacs-workspace->name ws))
    helm--treemacs-last-candidate))
 
-
 (defun treemacs-find-workspace (name)
   (seq-find
    (lambda (x) (string-equal name (treemacs-workspace->name x)))
@@ -618,7 +617,6 @@ FACE defaults to inheriting from default and highlight."
 			     (treemacs-select-workspace-by-name candidate))
 		   )
 	:buffer "*helm treemacs*"))
-
 
 ;; server
 (defvar server-p nil
@@ -646,7 +644,7 @@ FACE defaults to inheriting from default and highlight."
   :config
   (which-key-mode 1))
 
-;;; lsp:
+;;; LSP:
 (use-package lsp-mode
   :diminish lsp-mode
   :hook (prog-mode . lsp)
@@ -654,16 +652,14 @@ FACE defaults to inheriting from default and highlight."
 	 ("s-]" . xref-find-definitions)
 	 ("s-[" . xref-pop-marker-stack))
   :init
-  (setq lsp-auto-guess-root t)       ; Detect project root
-  (setq lsp-prefer-flymake nil)      ; Use lsp-ui and flycheck
-  (setq flymake-fringe-indicator-position 'right-fringe)
-  (setq flymake-diagnostic-functions '(lsp--flymake-backend nil))
-  :config
-  (setq lsp-inhibit-message t
+  (setq lsp-auto-guess-root t       ; Detect project root
+	lsp-prefer-flymake nil      ; Use lsp-ui and flycheck
+	flymake-fringe-indicator-position 'right-fringe
+	flymake-diagnostic-functions '(lsp--flymake-backend nil)
+	lsp-inhibit-message t
 	lsp-message-project-root-warning t
-	create-lockfiles nil
-	)
-
+	create-lockfiles nil)
+  :config
   ;; Restart server/workspace in case the lsp server exits unexpectedly.
   ;; https://emacs-china.org/t/topic/6392
   (defun restart-lsp-server ()
@@ -673,25 +669,7 @@ FACE defaults to inheriting from default and highlight."
     (revert-buffer t t)
     (message "LSP server restarted."))
 
-  (require 'lsp-clients)
-
-  ;; C/C++ Mode
-  ;; brew install ccls
-  (use-package ccls
-    :defines projectile-project-root-files-top-down-recurring
-    :hook ((c-mode c++-mode objc-mode cuda-mode) .
-	   (lambda () (require 'ccls) (lsp)))
-    :init
-    (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
-    :config
-    (with-eval-after-load 'projectile
-      (setq projectile-project-root-files-top-down-recurring
-	    (append '("compile_commands.json"
-		      ".ccls")
-		    projectile-project-root-files-top-down-recurring))))
-
-  )
-
+  (require 'lsp-clients))
 
 (use-package company-lsp
   :init (setq company-lsp-cache-candidates 'auto))
@@ -723,23 +701,13 @@ FACE defaults to inheriting from default and highlight."
 (use-package toml-mode
   :mode (("\\.toml\\'" . toml-mode)))
 
-;;; YAML: 
+;;; YAML:
 (use-package yaml-mode
   :mode (("\\.yaml\\'" . yaml-mode)))
 
 ;;; JSON:
 (use-package json-mode
   :mode (("\\.json\\'" . json-mode)))
-
-;;; Python:
-;; Installation:
-;;   pip3 install python-language-server[all]
-(use-package python-mode
-  :init
-  (add-hook 'python-mode 'lsp)
-  (when (executable-find "python3")
-    (setq python-shell-interpreter "python3"))
-  (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/")))
 
 ;;; Golang:
 (use-package go-mode
@@ -748,7 +716,7 @@ FACE defaults to inheriting from default and highlight."
   (when (memq window-system '(mac ns x))
     (dolist (var '("GOPATH" "GO15VENDOREXPERIMENT"))
       (unless (getenv var)
-	
+	(exec-path-from-shell-copy-env var))))
   :hook (go-mode . go-mode-hook-func)
   :bind (:map go-mode-map
 	      ("C-c d d" . godef-describe)
@@ -860,6 +828,23 @@ FACE defaults to inheriting from default and highlight."
   (use-package company-racer
     :config
     (add-to-list 'company-backends 'company-racer)))
+
+;;; C/C++:
+;; Installation:
+;;   brew install ccls
+(use-package ccls
+  :defines projectile-project-root-files-top-down-recurring
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
+	 (lambda () (require 'ccls) (lsp)))
+  :init
+  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
+  :config
+  (with-eval-after-load 'projectile
+    (setq projectile-project-root-files-top-down-recurring
+	  (append '("compile_commands.json"
+		    ".ccls")
+		  projectile-project-root-files-top-down-recurring))))
+
 
 ;;; Lua: 
 (use-package lua-mode
