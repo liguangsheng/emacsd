@@ -22,7 +22,7 @@
  en-fonts '("Fira Mono for Powerline" 13 "Source Code Pro" 13 "Courier New" 13)
  cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
  ;; 使用主题
- theme 'doom-one
+ theme 'doom-one-light
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		      ("https" . "127.0.0.1:1080")))
@@ -428,7 +428,7 @@
 
 ;; 高亮缩进
 (use-package highlight-indentation
-  ;; :disabled
+  :disabled
   :init (add-hook 'prog-mode-hook #'highlight-indentation-current-column-mode))
 
 ;; 高亮数字
@@ -537,6 +537,8 @@ FACE defaults to inheriting from default and highlight."
    '(company-tooltip-common-selection
      ((t (:inherit company-tooltip-selection :weight bold :underline nil))))))
 
+(use-package company-tabnine)
+
 (use-package helm-company)
 
 (use-package helm-rg)
@@ -639,7 +641,7 @@ FACE defaults to inheriting from default and highlight."
   :hook (prog-mode . lsp)
   :bind (("s-b" . xref-find-definitions)
 	 ("s-]" . xref-find-definitions)
-	 ("s-[" . evil-jump-backward))
+	 ("s-[" . xref-pop-marker-stack))
   :init
   (setq lsp-auto-guess-root t)       ; Detect project root
   (setq lsp-prefer-flymake nil)      ; Use lsp-ui and flycheck
@@ -680,6 +682,7 @@ FACE defaults to inheriting from default and highlight."
   ;; python-mode
   (add-hook 'python-mode 'lsp)
   (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
+
   )
 
 
@@ -818,22 +821,40 @@ FACE defaults to inheriting from default and highlight."
 (use-package golint)
 (use-package govet)
 
-;; rust
+;;; Rust: 
+;; install rust-analyzer
+;; curl -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-linux -o ~/.local/bin/rust-analyzer
+;; chmod +x ~/.local/bin/rust-analyzer
 (use-package rust-mode
-  :init (setq rust-format-on-save t))
+  :init (setq rust-format-on-save t
+	      lsp-rust-server 'rust-analyzer)
+  (add-hook 'rust-mode-hook (lambda ()
+			      (add-to-list 'company-backends #'company-tabnine))))
 
 (use-package rust-playground)
 
-;; lua
+(defun init-rust-racer()
+  (use-package racer
+    :init(unless (getenv "RUST_SRC_PATH")
+	   (setenv "RUST_SRC_PATH"
+		   "/Users/guangshengli/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src" )))
+
+  (use-package company-racer
+    :config
+    (add-to-list 'company-backends 'company-racer)))
+
+
+;;; Lua: 
 (use-package lua-mode
   :mode (("\\.lua\\'" . lua-mode))
   :interpreter ("lua" . lua-mode))
 
-;; typescript
+;;; Typescript:
 (use-package typescript-mode
-  :mode (("\\.ts\\'" . typescript-mode)))
+  :mode (("\\.ts\\'" . typescript-mode)
+	 ("\\.tsx\\'" . typescript-mode)))
 
-;; bazel
+;;; Bazel:
 (use-package bazel-mode
   :mode (("WORKSPACE\\'" . bazel-mode)
 	 ("BUILD\\'" . bazel-mode)))
