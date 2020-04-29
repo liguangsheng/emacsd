@@ -635,7 +635,18 @@ FACE defaults to inheriting from default and highlight."
 (when server-p
   (restart-emacs-server))
 
-;; lsp
+(use-package which-key
+  :init
+  (setq which-key-popup-type 'side-window
+	which-key-side-window-location 'bottom
+	which-key-idle-delay 0.4
+	which-key-separator " → "
+	which-key-prefix-prefix "+"
+	which-key-side-window-max-heght 0.25)
+  :config
+  (which-key-mode 1))
+
+;;; lsp:
 (use-package lsp-mode
   :diminish lsp-mode
   :hook (prog-mode . lsp)
@@ -692,11 +703,11 @@ FACE defaults to inheriting from default and highlight."
   :hook (lsp-mode . lsp-ui-mode)
   :init (setq scroll-margin 0))
 
-;; org-mode
+;;; org-mode:
 (use-package org-bullets
   :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-;; markdown
+;;; Markdown:
 (use-package markdown-mode
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
@@ -704,21 +715,31 @@ FACE defaults to inheriting from default and highlight."
 	 ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
-;; protobuf
+;;; Protobuf:
 (use-package protobuf-mode
   :mode (("\\.proto\\'" . protobuf-mode)))
 
-;; toml
+;;; TOML:
 (use-package toml-mode
   :mode (("\\.toml\\'" . toml-mode)))
 
-;; yaml
+;;; YAML: 
 (use-package yaml-mode
   :mode (("\\.yaml\\'" . yaml-mode)))
 
-;; json
+;;; JSON:
 (use-package json-mode
   :mode (("\\.json\\'" . json-mode)))
+
+;;; Python:
+;; Installation:
+;;   pip3 install python-language-server[all]
+(use-package python-mode
+  :init
+  (add-hook 'python-mode 'lsp)
+  (when (executable-find "python3")
+    (setq python-shell-interpreter "python3"))
+  (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/")))
 
 ;;; Golang:
 (use-package go-mode
@@ -727,7 +748,7 @@ FACE defaults to inheriting from default and highlight."
   (when (memq window-system '(mac ns x))
     (dolist (var '("GOPATH" "GO15VENDOREXPERIMENT"))
       (unless (getenv var)
-	(exec-path-from-shell-copy-env var))))
+	
   :hook (go-mode . go-mode-hook-func)
   :bind (:map go-mode-map
 	      ("C-c d d" . godef-describe)
@@ -840,16 +861,6 @@ FACE defaults to inheriting from default and highlight."
     :config
     (add-to-list 'company-backends 'company-racer)))
 
-;;; Python:
-;; Installation:
-;;   pip3 install python-language-server[all]
-(use-package python-mode
-  :init
-  (add-hook 'python-mode 'lsp)
-  (when (executable-find "python3")
-    (setq python-shell-interpreter "python3"))
-  (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/")))
-
 ;;; Lua: 
 (use-package lua-mode
   :mode (("\\.lua\\'" . lua-mode))
@@ -864,17 +875,6 @@ FACE defaults to inheriting from default and highlight."
 (use-package bazel-mode
   :mode (("WORKSPACE\\'" . bazel-mode)
 	 ("BUILD\\'" . bazel-mode)))
-
-(use-package which-key
-  :init
-  (setq which-key-popup-type 'side-window
-	which-key-side-window-location 'bottom
-	which-key-idle-delay 0.4
-	which-key-separator " → "
-	which-key-prefix-prefix "+"
-	which-key-side-window-max-heght 0.25)
-  :config
-  (which-key-mode 1))
 
 ;;; ----------------------------------------------------------------------------
 ;;; Keybindings
