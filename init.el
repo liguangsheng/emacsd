@@ -20,9 +20,9 @@
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
  en-fonts '("Fira Mono for Powerline" 13 "Source Code Pro" 13 "Courier New" 13)
- cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
+ ;; cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
  ;; 使用主题
- theme 'doom-one-light
+ theme 'doom-monokai-spectrum
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		      ("https" . "127.0.0.1:1080")))
@@ -158,6 +158,12 @@
   (set-next-selection-coding-system 'utf-16-le)
   (set-selection-coding-system 'utf-16-le)
   (set-clipboard-coding-system 'utf-16-le))
+
+;; Set bigger line spacing and vertically-center the text
+(defun set-bigger-spacing ()
+  (setq-local default-text-properties '(line-spacing 0.25 line-height 1.25)))
+(add-hook 'text-mode-hook 'set-bigger-spacing)
+(add-hook 'prog-mode-hook 'set-bigger-spacing)
 
 ;; Better variables
 (setq
@@ -722,6 +728,16 @@ FACE defaults to inheriting from default and highlight."
 ;;; JSON:
 (use-package json-mode
   :mode (("\\.json\\'" . json-mode)))
+
+;;; Python:
+;; Installation:
+;;   pip3 install python-language-server[all]
+(use-package python-mode
+  :init
+  (add-hook 'python-mode 'lsp)
+  (when (executable-find "python3")
+    (setq python-shell-interpreter "python3"))
+  (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/")))
 
 ;;; Golang:
 (use-package go-mode
