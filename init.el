@@ -1,5 +1,4 @@
-;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
-;;; Commentary:
+;; init.el --- Emacs configuration -*- lexical-binding: t; -*- ;;; Commentary:
 
 ;; This file bootstraps the configuration, which is divided into
 ;; a number of other files.
@@ -19,13 +18,13 @@
  ;; 中英文字体
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
- en-fonts '("Fira Mono for Powerline" 13 "Source Code Pro" 13 "Courier New" 13)
- ;; cn-fonts '("华文细黑" 16 "宋体" 15 "微软雅黑" 15)
+ en-fonts '("Fira Mono for Powerline" 12  "Source Code Pro" 12 "Menlo" 12 "Courier New" 12)
+ cn-fonts '("华文细黑" 12 "宋体" 12 "PingFang SC" 12 "微软雅黑" 12)
  ;; 使用主题
- theme 'doom-monokai-spectrum
+ theme 'doom-nord-light
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
- ;; 		      ("https" . "127.0.0.1:1080")))
+ ;; 		         ("https" . "127.0.0.1:1080")))
  server-p t
  )
 
@@ -47,6 +46,11 @@
 ;;; My Functions
 
 (require 'cl-lib)
+
+(defun hook-gross-modes (function &optional depth local)
+  (add-hook 'prog-mode-hook        function depth local)
+  (add-hook 'fundamental-mode-hook function depth local)
+  (add-hook 'text-mode-hook        function depth local))
 
 (defun indent-whole-buffer ()
   (interactive)
@@ -74,14 +78,14 @@
 (defun switch-to-modified-buffer ()
   "Switch to modified buffer"
   (interactive)
-  (let ((buf-list (seq-filter (lambda (x)
-				(not
-				 (or
-				  (not (buffer-modified-p x))
-				  (s-prefix? "*" (buffer-name x))
-				  (s-prefix? " *" (buffer-name x))
-				  (s-suffix? "-mode" (buffer-name x)))))
-			      (buffer-list))))
+  (let ((buf-list
+	 (seq-filter
+	  (lambda (x) (not (or
+			    (not (buffer-modified-p x))
+			    (s-prefix? "*" (buffer-name x))
+			    (s-prefix? " *" (buffer-name x))
+			    (s-suffix? "-mode" (buffer-name x)))))
+	  (buffer-list))))
     (if buf-list
 	(switch-to-buffer (first buf-list))
       (message "No buffer modified."))))
@@ -135,9 +139,7 @@
 
 ;; Show line number
 (when show-line-number-p
-  (add-hook 'prog-mode-hook        #'display-line-numbers-mode)
-  (add-hook 'fundamental-mode-hook #'display-line-numbers-mode)
-  (add-hook 'text-mode-hook        #'display-line-numbers-mode))
+  (hook-gross-modes #'display-line-numbers-mode))
 
 ;; Maximize frame at start
 (defvar maximize-frame-at-start-p t "Maximize-frame-at-start-p.")
@@ -162,8 +164,7 @@
 ;; Set bigger line spacing and vertically-center the text
 (defun set-bigger-spacing ()
   (setq-local default-text-properties '(line-spacing 0.25 line-height 1.25)))
-(add-hook 'text-mode-hook 'set-bigger-spacing)
-(add-hook 'prog-mode-hook 'set-bigger-spacing)
+(hook-gross-modes #'set-bigger-spacing)
 
 ;; Better variables
 (setq
@@ -265,48 +266,46 @@
 
 ;;; ----------------------------------------------------------------------------
 ;;; Init Font
-(defvar en-fonts '("Source Code Pro" 13 "Courier New" 13))
-(defvar cn-fonts '("宋体" 15 "微软雅黑" 15))
+(defvar en-fonts '("Menlo" 12 "Courier New" 12))
+(defvar cn-fonts '("PingFang SC" 12 "宋体" 12 "微软雅黑" 12))
 
-(defun init/exists-p (font-name)
+(defun font/exists-p (font-name)
   "Check if font exists."
   (if (null (x-list-fonts font-name)) nil t))
 
-(defun init/use-en (font-name font-size)
+(defun font/use-en (font-name font-size)
   "Set font for english."
   (set-face-attribute 'default nil
 		      :font (format "%s:pixelsize=%d" font-name font-size)
 		      :weight 'normal))
 
-(defun init/use-cn (font-name font-size)
+(defun font/use-cn (font-name font-size)
   "Set font for chinese."
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
 		      (font-spec :family font-name :size font-size))))
 
-(defun init/use-list (font-list font-func)
+(defun font/use-list (font-list font-func)
   "Search font in font-list, use it if exists."
   (unless (null font-list)
     (let ((font-name (car font-list))
 	  (font-size (cadr font-list)))
-      (if (init/exists-p font-name)
+      (if (font/exists-p font-name)
 	  (funcall font-func font-name font-size)
-	(init/use-list (cddr font-list) font-func)))))
+	(font/use-list (cddr font-list) font-func)))))
 
-(defun init/use-en-list (font-list)
-  (init/use-list font-list 'init/use-en))
+(defun font/use-en-list (font-list)
+  (font/use-list font-list 'font/use-en))
 
-(defun init/use-cn-list (font-list)
-  (init/use-list font-list 'init/use-cn))
-
+(defun font/use-cn-list (font-list)
+  (font/use-list font-list 'font/use-cn))
 
 (defun init-font ()
   (when (display-graphic-p)
-    (init/use-en-list en-fonts)
-    (init/use-cn-list cn-fonts)))
+    (font/use-en-list en-fonts)
+    (font/use-cn-list cn-fonts)))
 
 (init-font)
-
 ;;; ----------------------------------------------------------------------------
 ;;; Theme
 
@@ -345,9 +344,7 @@
 
 (use-package evil
   :init
-  (add-hook 'prog-mode-hook        #'evil-mode)
-  (add-hook 'fundamental-mode-hook #'evil-mode)
-  (add-hook 'text-mode-hook        #'evil-mode)
+  (hook-gross-modes #'evil-mode)
   :config
   (evil-ex-define-cmd "q"    'kill-this-buffer)
   (evil-ex-define-cmd "quit" 'evil-quit))
@@ -431,16 +428,16 @@
 
 ;; 彩虹分隔符
 (use-package rainbow-delimiters
-  :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  :init (hook-gross-modes #'rainbow-delimiters-mode))
 
 ;; 高亮缩进
 (use-package highlight-indentation
   :disabled
-  :init (add-hook 'prog-mode-hook #'highlight-indentation-current-column-mode))
+  :init (hook-gross-modes #'highlight-indentation-current-column-mode))
 
 ;; 高亮数字
 (use-package highlight-numbers
-  :config (add-hook 'prog-mode-hook #'highlight-numbers-mode))
+  :config (hook-gross-modes #'highlight-numbers-mode))
 
 ;; 高亮TODO
 (use-package hl-todo
@@ -594,6 +591,8 @@ FACE defaults to inheriting from default and highlight."
     (doom-themes-treemacs-config))
   (use-package treemacs-projectile)
   (use-package treemacs-evil)
+
+
   )
 
 (setq helm--treemacs-last-candidate "Default")
@@ -621,12 +620,12 @@ FACE defaults to inheriting from default and highlight."
 (defun helm-treemacs-workspace ()
   (interactive)
   (helm :sources (helm-build-sync-source "Helm-Treemacs"
-		   :candidates (helm--treemacs-workspace-candidates)
-		   :fuzzy-match t
-		   :action (lambda (candidate)
-			     (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
-			     (treemacs-select-workspace-by-name candidate))
-		   )
+					 :candidates (helm--treemacs-workspace-candidates)
+					 :fuzzy-match t
+					 :action (lambda (candidate)
+						   (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
+						   (treemacs-select-workspace-by-name candidate))
+					 )
 	:buffer "*helm treemacs*"))
 
 ;; server
@@ -703,7 +702,16 @@ FACE defaults to inheriting from default and highlight."
 
 ;;; org-mode:
 (use-package org-bullets
-  :init (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  :init (add-hook 'org-mode-hook
+		  (lambda ()
+		    (org-bullets-mode 1)
+		    ;; 在org-table中使用中英文等宽的字体使表格框线对齐
+		    (set-face-attribute 'org-table nil 
+					;; :family "Noto Sans Mono CJK SC"
+					:family "Iosevka"
+					:weight 'normal
+					:width 'normal)
+		    )))
 
 ;;; Markdown:
 (use-package markdown-mode
@@ -711,7 +719,14 @@ FACE defaults to inheriting from default and highlight."
   :mode (("README\\.md\\'" . gfm-mode)
 	 ("\\.md\\'" . markdown-mode)
 	 ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "multimarkdown")
+  (add-hook 'markdown-mode-hook
+	    (lambda ()
+	      (set-face-attribute 'markdown-table-face nil 
+				  ;; :family "Noto Sans Mono CJK SC"
+				  :family "Iosevka"
+				  :weight 'normal
+				  :width 'normal))))
 
 ;;; Protobuf:
 (use-package protobuf-mode
@@ -968,6 +983,9 @@ FACE defaults to inheriting from default and highlight."
 ;; Load custom file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-readable-p custom-file) (load custom-file))
+
+;;; --------------------------------------------------------------------------
+;; Experimental:
 
 ;;; init.el ends here
 
