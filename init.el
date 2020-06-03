@@ -188,9 +188,9 @@
  backup-directory-alist       `(("." . ,(concat user-emacs-directory "backups")))
  )
 
-(add-hook 'after-init-hook
-	  (lambda ()
-	    (setq gc-cons-threshold (* 1 1024 1024 1024 8)))) ;; 1GB
+;; (add-hook 'after-init-hook
+;; 	  (lambda ()
+;; 	    (setq gc-cons-threshold (* 1 1024 1024 1024 8)))) ;; 1GB
 
 ;;; ----------------------------------------------------------------------------
 ;;; Package Manager
@@ -342,6 +342,11 @@
 ;;;; Initilize Packages
 (use-package shut-up)
 
+;; 内置undo-tree很卡，用新版本的undo-tree替换掉
+;; git clone http://www.dr-qubit.org/git/undo-tree.git ~/.emacs.d/site-lisp
+(use-package undo-tree
+  :load-path "site-lisp/undo-tree")
+
 (use-package evil
   :init
   (hook-gross-modes #'evil-mode)
@@ -425,6 +430,10 @@
     "SPC" 'avy-goto-word-1
     "l" 'avy-goto-line)
   :config (avy-setup-default))
+
+;; emoji
+(use-package emojify
+  :config (global-emojify-mode))
 
 ;; 彩虹分隔符
 (use-package rainbow-delimiters
@@ -986,6 +995,7 @@ FACE defaults to inheriting from default and highlight."
 
 ;;; --------------------------------------------------------------------------
 ;; Experimental:
+
 
 ;;; init.el ends here
 
