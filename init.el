@@ -18,7 +18,8 @@
  ;; 中英文字体
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
- en-fonts '("Fira Mono for Powerline" 12  "Source Code Pro" 12 "Menlo" 12 "Courier New" 12)
+ en-fonts '("Fira Mono for Powerline" 12  "Source Code Pro" 12 "Menlo" 12
+	    "Courier New" 12)
  cn-fonts '("华文细黑" 12 "宋体" 12 "PingFang SC" 12 "微软雅黑" 12)
  ;; 使用主题
  theme 'doom-nord-light
@@ -28,10 +29,12 @@
  server-p t
  )
 
-(defconst user-emacs-lisp-directory  (expand-file-name "lisp/" user-emacs-directory)
+(defconst user-emacs-lisp-directory
+  (expand-file-name "lisp/" user-emacs-directory)
   "Path to .emacs.d/lisp directory where init files exists.")
 
-(defconst user-emacs-site-lisp-directory (expand-file-name "site-lisp/" user-emacs-directory)
+(defconst user-emacs-site-lisp-directory
+  (expand-file-name "site-lisp/" user-emacs-directory)
   "Path to .emacs.d/site-lisp directory.")
 
 ;; Add dir to load-path
@@ -42,7 +45,7 @@
 (let ((default-directory user-emacs-site-lisp-directory))
   (normal-top-level-add-subdirs-to-load-path))
 
-;;; -----------------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
 ;;; My Functions
 
 (require 'cl-lib)
@@ -113,7 +116,7 @@
   "Return a random theme symbol"
   (random-choice (custom-available-themes)))
 
-;;; ------------------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
 ;;; Basic
 
 ;; Initlize Frame
@@ -143,7 +146,8 @@
 
 ;; Maximize frame at start
 (defvar maximize-frame-at-start-p t "Maximize-frame-at-start-p.")
-(when maximize-frame-at-start-p (add-to-list 'initial-frame-alist '(fullscreen . maximized)))
+(when maximize-frame-at-start-p (add-to-list 'initial-frame-alist
+					     '(fullscreen . maximized)))
 
 ;; Use utf-8 as default coding system.
 (when (fboundp 'set-charset-priority)
@@ -185,7 +189,8 @@
  vc-follow-symlinks           t
  version-control              t
  visible-bell                 0
- backup-directory-alist       `(("." . ,(concat user-emacs-directory "backups")))
+ backup-directory-alist       `(("." . ,(concat user-emacs-directory
+						"backups")))
  )
 
 ;; (add-hook 'after-init-hook
@@ -199,7 +204,8 @@
 (require 'package)
 (setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
 			 ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
-			 ("melpa-stable" . "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
+			 ("melpa-stable" .
+			  "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
 			 ("org" . "https://mirrors.ustc.edu.cn/elpa/org/")))
 
 ;; Initialize packages
@@ -338,7 +344,7 @@
 (unless (eq theme 'default)
   (load-theme-dwim))
 
-;;;; ----------------------------------------------------------------------------
+;;;; ---------------------------------------------------------------------------
 ;;;; Initilize Packages
 (use-package shut-up)
 
@@ -409,6 +415,10 @@
    smooth-scroll-strict-margins t)
   :config
   (when smooth-scrolling-p (smooth-scrolling-mode 1)))
+
+(use-package fill-column-indicator
+  :init (setq fci-rule-column 80)
+  (add-hook 'prog-mode-hook #'fci-mode))
 
 ;; 扩展选择区域
 (use-package expand-region
@@ -608,7 +618,8 @@ FACE defaults to inheriting from default and highlight."
 
 (defun helm--treemacs-workspace-candidates ()
   (move-to-front
-   (cl-loop for ws in (treemacs-workspaces) collect (treemacs-workspace->name ws))
+   (cl-loop for ws in (treemacs-workspaces) collect (treemacs-workspace->name
+						     ws))
    helm--treemacs-last-candidate))
 
 (defun treemacs-find-workspace (name)
@@ -629,12 +640,14 @@ FACE defaults to inheriting from default and highlight."
 (defun helm-treemacs-workspace ()
   (interactive)
   (helm :sources (helm-build-sync-source "Helm-Treemacs"
-					 :candidates (helm--treemacs-workspace-candidates)
-					 :fuzzy-match t
-					 :action (lambda (candidate)
-						   (setq helm--treemacs-last-candidate (treemacs-workspace->name (treemacs-current-workspace)))
-						   (treemacs-select-workspace-by-name candidate))
-					 )
+		   :candidates (helm--treemacs-workspace-candidates)
+		   :fuzzy-match t
+		   :action (lambda (candidate)
+			     (setq helm--treemacs-last-candidate
+				   (treemacs-workspace->name
+				    (treemacs-current-workspace)))
+			     (treemacs-select-workspace-by-name candidate))
+		   )
 	:buffer "*helm treemacs*"))
 
 ;; server
@@ -877,7 +890,8 @@ FACE defaults to inheriting from default and highlight."
   (use-package racer
     :init(unless (getenv "RUST_SRC_PATH")
 	   (setenv "RUST_SRC_PATH"
-		   "/Users/guangshengli/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src" )))
+		   "/Users/guangshengli/.rustup/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src"
+		   )))
 
   (use-package company-racer
     :config
@@ -891,7 +905,8 @@ FACE defaults to inheriting from default and highlight."
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
 	 (lambda () (require 'ccls) (lsp)))
   :init
-  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
+  (setq ccls-initialization-options '(:index (:comments 2)
+					     :completion (:detailedLabel t)))
   :config
   (with-eval-after-load 'projectile
     (setq projectile-project-root-files-top-down-recurring
@@ -993,7 +1008,7 @@ FACE defaults to inheriting from default and highlight."
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-readable-p custom-file) (load custom-file))
 
-;;; --------------------------------------------------------------------------
+;;; ----------------------------------------------------------------------------
 ;; Experimental:
 
 
