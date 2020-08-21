@@ -11,3 +11,5 @@ elpa/
 backups/
 .lsp-session*
 emojis
+auto-save-list/
+server/

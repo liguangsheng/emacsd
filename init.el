@@ -22,7 +22,7 @@
 	    "Courier New" 12)
  cn-fonts '("华文细黑" 12 "宋体" 12 "PingFang SC" 12 "微软雅黑" 12)
  ;; 使用主题
- theme 'doom-nord-light
+ theme 'doom-Iosvkem
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		         ("https" . "127.0.0.1:1080")))
@@ -362,8 +362,8 @@
 
 (use-package evil-leader
   :config
-  (evil-leader/set-leader "<SPC>")
-  (global-evil-leader-mode)  )
+  (global-evil-leader-mode)
+  (evil-leader/set-leader "<SPC>"))
 
 (use-package evil-surround
   :config (global-evil-surround-mode 1))
@@ -378,6 +378,7 @@
   (customize-set-variable 'helm-semantic-lynx-style-map t)
   (customize-set-variable 'helm-occur-use-ioccur-style-keys t)
   (customize-set-variable 'helm-grep-use-ioccur-style-keys t)
+
   (evil-leader/set-key
     "bb" 'helm-mini
     "ff" 'helm-find-files
@@ -436,10 +437,11 @@
 ;; 跳转
 (use-package avy
   :init
+  (avy-setup-default)
   (evil-leader/set-key
     "SPC" 'avy-goto-word-1
-    "l" 'avy-goto-line)
-  :config (avy-setup-default))
+    "l"   'avy-goto-line
+  ))
 
 ;; emoji
 (use-package emojify
@@ -596,6 +598,10 @@ FACE defaults to inheriting from default and highlight."
       (progn
 	(aw--push-window (selected-window))
 	(treemacs-select-window))))
+    (when (fboundp 'doom-themes-treemacs-config)
+    (doom-themes-treemacs-config))
+  (use-package treemacs-projectile)
+  (use-package treemacs-evil)
 
   (evil-leader/set-key
     "-"  'treemacs-switch-window
@@ -605,14 +611,7 @@ FACE defaults to inheriting from default and highlight."
     "tw" 'treemacs-switch-workspace
     "tp" 'treemacs-add-and-display-current-project
     "ta" 'treemacs-find-tag
-    )
-  (when (fboundp 'doom-themes-treemacs-config)
-    (doom-themes-treemacs-config))
-  (use-package treemacs-projectile)
-  (use-package treemacs-evil)
-
-
-  )
+    ))
 
 (setq helm--treemacs-last-candidate "Default")
 
@@ -702,7 +701,7 @@ FACE defaults to inheriting from default and highlight."
     (revert-buffer t t)
     (message "LSP server restarted."))
 
-  (require 'lsp-clients)
+  ;; (require 'lsp-clients)
 
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
