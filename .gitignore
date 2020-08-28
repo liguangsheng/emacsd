@@ -13,3 +13,5 @@ backups/
 emojis
 auto-save-list/
 server/
+desktop/
+.emacs.desktop

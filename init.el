@@ -167,7 +167,7 @@
 
 ;; Set bigger line spacing and vertically-center the text
 (defun set-bigger-spacing ()
-  (setq-local default-text-properties '(line-spacing 0.25 line-height 1.25)))
+  (setq-local default-text-properties '(line-spacing 0.20 line-height 1.20)))
 (hook-gross-modes #'set-bigger-spacing)
 
 ;; Better variables
@@ -191,6 +191,8 @@
  visible-bell                 0
  backup-directory-alist       `(("." . ,(concat user-emacs-directory
 						"backups")))
+ font-lock-maximum-size       5000000
+ desktop-dirname              (concat user-emacs-directory "desktop")
  )
 
 ;; (add-hook 'after-init-hook
@@ -202,11 +204,8 @@
 
 ;; package.el
 (require 'package)
-(setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
-			 ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
-			 ("melpa-stable" .
-			  "https://mirrors.ustc.edu.cn/elpa/melpa-stable/")
-			 ("org" . "https://mirrors.ustc.edu.cn/elpa/org/")))
+(setq package-archives '(("gnu"   . "https://elpa.emacs-china.org/gnu/")
+			 ("melpa" . "https://elpa.emacs-china.org/melpa/")))
 
 ;; Initialize packages
 (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
@@ -350,8 +349,9 @@
 
 ;; 内置undo-tree很卡，用新版本的undo-tree替换掉
 ;; git clone http://www.dr-qubit.org/git/undo-tree.git ~/.emacs.d/site-lisp
-(use-package undo-tree
-  :load-path "site-lisp/undo-tree")
+;; 换到windows以后，卡顿现象消失了，所以注释掉了下面两行
+;; (use-package undo-tree
+;;   :load-path "site-lisp/undo-tree")
 
 (use-package evil
   :init
@@ -441,7 +441,7 @@
   (evil-leader/set-key
     "SPC" 'avy-goto-word-1
     "l"   'avy-goto-line
-  ))
+    ))
 
 ;; emoji
 (use-package emojify
@@ -566,7 +566,8 @@ FACE defaults to inheriting from default and highlight."
    '(company-tooltip-common-selection
      ((t (:inherit company-tooltip-selection :weight bold :underline nil))))))
 
-(use-package company-tabnine)
+(use-package company-tabnine
+  :config (add-to-list 'company-backends #'company-tabnine))
 
 (use-package helm-company)
 
@@ -590,6 +591,27 @@ FACE defaults to inheriting from default and highlight."
 ;; treemacs
 (use-package treemacs
   :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :bind (([f8] . treemacs)
+	 ("M-0"       . treemacs-select-window)
+	 ("C-x t 1"   . treemacs-delete-other-windows)
+	 ("C-x t t"   . treemacs)
+	 ("C-x t B"   . treemacs-bookmark)
+	 ("C-x t C-t" . treemacs-find-file)
+	 ("C-x t M-t" . treemacs-find-tag)
+	 :map treemacs-mode-map
+	 ([mouse-1]   . treemacs-single-click-expand-action))
+  :config
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode t)
+  (pcase (cons (not (null (executable-find "git")))
+	       (not (null treemacs-python-executable)))
+    (`(t . t)
+     (treemacs-git-mode 'deferred))
+    (`(t . _)
+     (treemacs-git-mode 'simple)))
   (treemacs-resize-icons 12)
   (defun treemacs-switch-window ()
     (interactive)
@@ -598,10 +620,8 @@ FACE defaults to inheriting from default and highlight."
       (progn
 	(aw--push-window (selected-window))
 	(treemacs-select-window))))
-    (when (fboundp 'doom-themes-treemacs-config)
+  (when (fboundp 'doom-themes-treemacs-config)
     (doom-themes-treemacs-config))
-  (use-package treemacs-projectile)
-  (use-package treemacs-evil)
 
   (evil-leader/set-key
     "-"  'treemacs-switch-window
@@ -612,6 +632,28 @@ FACE defaults to inheriting from default and highlight."
     "tp" 'treemacs-add-and-display-current-project
     "ta" 'treemacs-find-tag
     ))
+
+(use-package treemacs-evil
+  :after treemacs evil
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+
+(use-package treemacs-persp ;;treemacs-persective if you use perspective.el vs. persp-mode
+  :after treemacs persp-mode ;;or perspective vs. persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
 
 (setq helm--treemacs-last-candidate "Default")
 
@@ -639,14 +681,14 @@ FACE defaults to inheriting from default and highlight."
 (defun helm-treemacs-workspace ()
   (interactive)
   (helm :sources (helm-build-sync-source "Helm-Treemacs"
-		   :candidates (helm--treemacs-workspace-candidates)
-		   :fuzzy-match t
-		   :action (lambda (candidate)
-			     (setq helm--treemacs-last-candidate
-				   (treemacs-workspace->name
-				    (treemacs-current-workspace)))
-			     (treemacs-select-workspace-by-name candidate))
-		   )
+					 :candidates (helm--treemacs-workspace-candidates)
+					 :fuzzy-match t
+					 :action (lambda (candidate)
+						   (setq helm--treemacs-last-candidate
+							 (treemacs-workspace->name
+							  (treemacs-current-workspace)))
+						   (treemacs-select-workspace-by-name candidate))
+					 )
 	:buffer "*helm treemacs*"))
 
 ;; server
@@ -679,9 +721,9 @@ FACE defaults to inheriting from default and highlight."
 (use-package lsp-mode
   :diminish lsp-mode
   :hook (prog-mode . lsp)
-  :bind (("s-b" . xref-find-definitions)
-	 ("s-]" . xref-find-definitions)
-	 ("s-[" . xref-pop-marker-stack))
+  :bind (("M-b" . xref-find-definitions)
+	 ("M-]" . xref-find-definitions)
+	 ("M-[" . xref-pop-marker-stack))
   :init
   (setq lsp-auto-guess-root t       ; Detect project root
 	lsp-prefer-flymake nil      ; Use lsp-ui and flycheck
@@ -700,8 +742,6 @@ FACE defaults to inheriting from default and highlight."
     (lsp-restart-workspace)
     (revert-buffer t t)
     (message "LSP server restarted."))
-
-  ;; (require 'lsp-clients)
 
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
@@ -777,17 +817,17 @@ FACE defaults to inheriting from default and highlight."
 
 ;;; Golang:
 (use-package go-mode
+  :hook (go-mode . go-mode-hook-func)
+  :bind (:map go-mode-map
+	      ("C-c d d" . godef-describe)
+	      ("C-c d p" . godoc-at-point)
+	      ("C-c r u" . go-remove-unused-imports))
   :init
   ;; Copy system environment variables
   (when (memq window-system '(mac ns x))
     (dolist (var '("GOPATH" "GO15VENDOREXPERIMENT"))
       (unless (getenv var)
 	(exec-path-from-shell-copy-env var))))
-  :hook (go-mode . go-mode-hook-func)
-  :bind (:map go-mode-map
-	      ("C-c d d" . godef-describe)
-	      ("C-c d p" . godoc-at-point)
-	      ("C-c r u" . go-remove-unused-imports))
   :config
   ;; 寻找goretuens作为格式化工具
   ;; go get -u -v github.com/sqs/goreturns
@@ -955,7 +995,7 @@ FACE defaults to inheriting from default and highlight."
    ("≈"       . helm-M-x)
    ("C-j"     . ace-window)
    ("C-x C-f" . helm-find-files)
-   ("M-s-l"   . indent-whole-buffer)
+   ("C-M-l"   . indent-whole-buffer)
    ("s-/"     . comment-line))
 
   (bind-keys
