@@ -1,0 +1,28 @@
+#+TITLE: emacsd
+#+AUTHOR: liguangsheng
+#+STARTUP: showall
+
+my emacs configuration
+
+* Install emacs for windows
+
+https://www.gnu.org/savannah-checkouts/gnu/emacs/download.html
+
+* Install dependencies
+
+** Golang
+   #+BEGIN_SRC 
+   go get -u -v golang.org/x/tools/gopls@latest
+   go get -u -v github.com/sqs/goreturns
+   #+END_SRC
+
+** Rust
+   #+BEGIN_SRC 
+   rustup component add rust-src
+   #+END_SRC
+ 
+
+** Python 
+   #+BEGIN_SRC 
+   pip3 install python-language-server[all]
+   #+END_SRC

@@ -1,5 +1,4 @@
 ;; init.el --- Emacs configuration -*- lexical-binding: t; -*- ;;; Commentary:
-
 ;; This file bootstraps the configuration, which is divided into
 ;; a number of other files.
 
@@ -18,7 +17,7 @@
  ;; 中英文字体
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
- en-fonts '("Fira Mono for Powerline" 12  "Source Code Pro" 12 "Menlo" 12
+ en-fonts '("Inconsolata for Powerline" 14  "Source Code Pro" 12 "Menlo" 12
 	    "Courier New" 12)
  cn-fonts '("华文细黑" 12 "宋体" 12 "PingFang SC" 12 "微软雅黑" 12)
  ;; 使用主题
@@ -347,11 +346,9 @@
 ;;;; Initilize Packages
 (use-package shut-up)
 
-;; 内置undo-tree很卡，用新版本的undo-tree替换掉
-;; git clone http://www.dr-qubit.org/git/undo-tree.git ~/.emacs.d/site-lisp
-;; 换到windows以后，卡顿现象消失了，所以注释掉了下面两行
-;; (use-package undo-tree
-;;   :load-path "site-lisp/undo-tree")
+(defmacro withf (func &rest body)
+  (declare (indent 1) (debug t))
+  `(when (fboundp ,func) ,@body))
 
 (use-package evil
   :init
@@ -418,7 +415,7 @@
   (when smooth-scrolling-p (smooth-scrolling-mode 1)))
 
 (use-package fill-column-indicator
-  :init (setq fci-rule-column 80)
+  :init (setq fci-rule-column 120)
   (add-hook 'prog-mode-hook #'fci-mode))
 
 ;; 扩展选择区域
@@ -545,7 +542,7 @@ FACE defaults to inheriting from default and highlight."
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-  (shut-up (yas-global-mode 1)))
+  (withf 'shut-up (shut-up (yas-global-mode 1))))
 
 (use-package company
   :defer nil
@@ -566,8 +563,8 @@ FACE defaults to inheriting from default and highlight."
    '(company-tooltip-common-selection
      ((t (:inherit company-tooltip-selection :weight bold :underline nil))))))
 
-(use-package company-tabnine
-  :config (add-to-list 'company-backends #'company-tabnine))
+;; (use-package company-tabnine
+;;   :config (add-to-list 'company-backends #'company-tabnine))
 
 (use-package helm-company)
 
@@ -593,6 +590,13 @@ FACE defaults to inheriting from default and highlight."
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  (evil-leader/set-key
+    "-"  'treemacs-switch-window
+    "="  'helm-treemacs-workspace
+    "tt" 'treemacs
+    "tw" 'treemacs-switch-workspace
+    "tp" 'treemacs-add-and-display-current-project
+    "ta" 'treemacs-find-tag)
   :bind (([f8] . treemacs)
 	 ("M-0"       . treemacs-select-window)
 	 ("C-x t 1"   . treemacs-delete-other-windows)
@@ -613,25 +617,8 @@ FACE defaults to inheriting from default and highlight."
     (`(t . _)
      (treemacs-git-mode 'simple)))
   (treemacs-resize-icons 12)
-  (defun treemacs-switch-window ()
-    (interactive)
-    (if (treemacs-is-treemacs-window-selected?)
-	(aw-flip-window)
-      (progn
-	(aw--push-window (selected-window))
-	(treemacs-select-window))))
   (when (fboundp 'doom-themes-treemacs-config)
-    (doom-themes-treemacs-config))
-
-  (evil-leader/set-key
-    "-"  'treemacs-switch-window
-    "="  'helm-treemacs-workspace
-    "tr" 'treemacs
-    "tt" 'treemacs-switch-window
-    "tw" 'treemacs-switch-workspace
-    "tp" 'treemacs-add-and-display-current-project
-    "ta" 'treemacs-find-tag
-    ))
+    (doom-themes-treemacs-config)))
 
 (use-package treemacs-evil
   :after treemacs evil
@@ -720,7 +707,6 @@ FACE defaults to inheriting from default and highlight."
 ;;; LSP:
 (use-package lsp-mode
   :diminish lsp-mode
-  :hook (prog-mode . lsp)
   :bind (("M-b" . xref-find-definitions)
 	 ("M-]" . xref-find-definitions)
 	 ("M-[" . xref-pop-marker-stack))
@@ -806,8 +792,6 @@ FACE defaults to inheriting from default and highlight."
   :mode (("\\.json\\'" . json-mode)))
 
 ;;; Python:
-;; Installation:
-;;   pip3 install python-language-server[all]
 (use-package python-mode
   :init
   (add-hook 'python-mode 'lsp)
@@ -829,8 +813,7 @@ FACE defaults to inheriting from default and highlight."
       (unless (getenv var)
 	(exec-path-from-shell-copy-env var))))
   :config
-  ;; 寻找goretuens作为格式化工具
-  ;; go get -u -v github.com/sqs/goreturns
+  ;; 优先寻找goreturns作为格式化工具
   (when (executable-find "goreturns")
     (setq gofmt-command "goreturns"))
 
@@ -838,8 +821,6 @@ FACE defaults to inheriting from default and highlight."
     ;; 保存buffer之前格式化文件
     (add-hook 'before-save-hook 'gofmt-before-save t)
 
-    ;; Go support for lsp-mode using Sourcegraph's Go Language Server
-    ;; go get -u -v github.com/sourcegraph/go-langserver
     (require 'lsp-go)
 
     ;; eyes and hands comfort
@@ -914,14 +895,11 @@ FACE defaults to inheriting from default and highlight."
 (use-package govet)
 
 ;;; Rust: 
-;; Installation:
-;;   curl -L https://github.com/rust-analyzer/rust-analyzer/releases/latest/download/rust-analyzer-mac -o ~/.local/bin/rust-analyzer
-;;   chmod +x ~/.local/bin/rust-analyzer
 (use-package rust-mode
   :init (setq rust-format-on-save t
-	      lsp-rust-server 'rust-analyzer)
-  (add-hook 'rust-mode-hook (lambda ()
-			      (add-to-list 'company-backends #'company-tabnine))))
+	      lsp-rust-server 'rust-analyzer))
+;; (add-hook 'rust-mode-hook (lambda ()
+;; 			      (add-to-list 'company-backends #'company-tabnine))))
 
 (use-package rust-playground)
 
@@ -1049,6 +1027,12 @@ FACE defaults to inheriting from default and highlight."
 
 ;;; ----------------------------------------------------------------------------
 ;; Experimental:
+
+;; (setq redisplay-dont-pause t
+;;       scroll-margin 1
+;;       scroll-step 1
+;;       scroll-conservatively 10000
+;;       scroll-preserve-screen-position 1)
 
 
 ;;; init.el ends here
