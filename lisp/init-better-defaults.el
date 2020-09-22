@@ -74,8 +74,13 @@
 
 ;; Change default path
 (setq
- custom-file                  (expand-file-name "custom.el" user-emacs-cache-directory)
- desktop-dirname              (expand-file-name "desktop" user-emacs-cache-directory)
- backup-directory-alist       `(("." . ,(expand-file-name "backups" user-emacs-directory))))
+ custom-file                    (ucache "custom.el")
+ desktop-dirname                (ucache "desktop")
+ backup-directory-alist         `(("." . ,(ucache "backups")))
+ recentf-save-file              (ucache "recentf")
+ auto-save-file-name-transforms `((".*" ,(ucache "auto-save-list") t))
+ save-place-file                (ucache "places")
+ savehist-file                  (ucache "savehist")
+ )
 
 (provide 'init-better-defaults)

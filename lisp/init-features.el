@@ -5,8 +5,10 @@
 (use-package shut-up)
 
 (use-package restart-emacs
+  :bind (("C-c q r" . restart-emacs))
   :init
-  (evil-leader/set-key "qr" 'restart-emacs))
+  (with-eval-after-load "evil-leader"
+    (evil-leader/set-key "qr" 'restart-emacs)))
 
 ;; 智能括号
 (defvar smartparens-p nil)
@@ -34,25 +36,36 @@
 
 ;; 扩展选择区域
 (use-package expand-region
+  :bind (("C-c e p" . er/mark-inside-pairs)
+	 ("C-c e q" . er/mark-inside-quotes)
+	 ("C-c e u" . er/mark-url)
+	 ("C-c e e" . er/mark-email)
+	 ("C-c e a" . er/mark-text-paragraph)
+	 ("C-c e v" . er/expand-region)
+	 ("C-c v"   . er/expand-region))
   :init
-  (evil-leader/set-key
-    "ep" 'er/mark-inside-pairs
-    "eq" 'er/mark-inside-quotes
-    "eu" 'er/mark-url
-    "ee" 'er/mark-email
-    "ea" 'er/mark-text-paragraph
-    "ev" 'er/expand-region
-    "v" 'er/expand-region
-    ))
+  (with-eval-after-load "evil-leader"
+    (evil-leader/set-key
+      "ep" 'er/mark-inside-pairs
+      "eq" 'er/mark-inside-quotes
+      "eu" 'er/mark-url
+      "ee" 'er/mark-email
+      "ea" 'er/mark-text-paragraph
+      "ev" 'er/expand-region
+      "v" 'er/expand-region
+      )))
 
 ;; 跳转
 (use-package avy
+  :bind (("C-c SPC" . avy-goto-word-1)
+	 ("C-c l"   . avy-goto-line))
   :init
   (avy-setup-default)
-  (evil-leader/set-key
-    "SPC" 'avy-goto-word-1
-    "l"   'avy-goto-line
-    ))
+  (with-eval-after-load "evil-leader"
+    (evil-leader/set-key
+      "SPC" 'avy-goto-word-1
+      "l"   'avy-goto-line
+      )))
 
 ;; emoji
 (use-package emojify

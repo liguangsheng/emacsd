@@ -9,6 +9,10 @@ my emacs configuration
 https://www.gnu.org/savannah-checkouts/gnu/emacs/download.html
 
 * Install dependencies
+** ripgrep
+   #+BEGIN_SRC 
+   cargo install ripgrep
+   #+END_SRC
 
 ** Golang
    #+BEGIN_SRC 

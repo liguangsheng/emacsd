@@ -1,7 +1,9 @@
 ;; package.el
 (require 'package)
-(setq package-archives '(("gnu"   . "https://elpa.emacs-china.org/gnu/")
-			 ("melpa" . "https://elpa.emacs-china.org/melpa/")))
+(setq
+ package-user-dir (ucache "elpa")
+ package-archives '(("gnu"   . "https://elpa.emacs-china.org/gnu/")
+		    ("melpa" . "https://elpa.emacs-china.org/melpa/")))
 
 ;; Initialize packages
 (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27

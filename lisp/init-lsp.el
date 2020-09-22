@@ -5,13 +5,16 @@
 	 ("M-]" . xref-find-definitions)
 	 ("M-[" . xref-pop-marker-stack))
   :init
-  (setq lsp-auto-guess-root t       ; Detect project root
-	lsp-prefer-flymake nil      ; Use lsp-ui and flycheck
-	flymake-fringe-indicator-position 'right-fringe
-	flymake-diagnostic-functions '(lsp--flymake-backend nil)
-	lsp-inhibit-message t
-	lsp-message-project-root-warning t
-	create-lockfiles nil)
+  (setq
+   create-lockfiles nil
+   flymake-diagnostic-functions '(lsp--flymake-backend nil)
+   flymake-fringe-indicator-position 'right-fringe
+   lsp-auto-guess-root t       ; Detect project root
+   lsp-inhibit-message t
+   lsp-message-project-root-warning t
+   lsp-prefer-flymake nil      ; Use lsp-ui and flycheck
+   lsp-session-file (ucache ".lsp-session-v1")
+   )
 
   :config
   ;; Restart server/workspace in case the lsp server exits unexpectedly.

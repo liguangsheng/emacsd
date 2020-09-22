@@ -16,7 +16,7 @@
  smooth-scrolling-p t
  ;; 中英文字体
  ;; https://github.com/powerline/fonts
- ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
+ ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash(expand-file-name "")
  en-fonts '("Inconsolata for Powerline" 14  "Source Code Pro" 12 "Menlo" 12
 	    "Courier New" 12)
  cn-fonts '("华文细黑" 12 "宋体" 12 "PingFang SC" 12 "微软雅黑" 12)

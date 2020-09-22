@@ -7,8 +7,8 @@
   "Path to .emacs.d/site-lisp directory.")
 
 (defconst user-emacs-cache-directory
-  (expand-file-name "cache/" user-emacs-directory)
-  "Path to .emacs.d/cache directory.")
+  (expand-file-name ".cache/" user-emacs-directory)
+  "Path to .emacs.d/.cache directory.")
 
 ;; Add dir to load-path
 (add-to-list 'load-path user-emacs-lisp-directory)
@@ -23,5 +23,8 @@
   (unless (file-executable-p dir) (make-directory dir)))
 
 (make-directory-unless-exists user-emacs-cache-directory)
+
+(defun ucache (filename)
+  (expand-file-name filename user-emacs-cache-directory))
 
 (provide 'init-core)
