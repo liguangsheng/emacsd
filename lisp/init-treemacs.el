@@ -3,13 +3,15 @@
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  (evil-leader/set-key
-    "-"  'treemacs-switch-window
-    "="  'helm-treemacs-workspace
-    "tt" 'treemacs
-    "tw" 'treemacs-switch-workspace
-    "tp" 'treemacs-add-and-display-current-project
-    "ta" 'treemacs-find-tag)
+  (with-eval-after-load 'evil-leader
+    (evil-leader/set-key
+      "-"  'treemacs-switch-window
+      "="  'helm-treemacs-workspace
+      "tt" 'treemacs
+      "tw" 'treemacs-switch-workspace
+      "tp" 'treemacs-add-and-display-current-project
+      "ta" 'treemacs-find-tag))
+  (setq treemacs-width 50)
   :bind (([f8] . treemacs)
 	 ("M-0"       . treemacs-select-window)
 	 ("C-x t 1"   . treemacs-delete-other-windows)
@@ -81,14 +83,14 @@
 (defun helm-treemacs-workspace ()
   (interactive)
   (helm :sources (helm-build-sync-source "Helm-Treemacs"
-					 :candidates (helm--treemacs-workspace-candidates)
-					 :fuzzy-match t
-					 :action (lambda (candidate)
-						   (setq helm--treemacs-last-candidate
-							 (treemacs-workspace->name
-							  (treemacs-current-workspace)))
-						   (treemacs-select-workspace-by-name candidate))
-					 )
+		   :candidates (helm--treemacs-workspace-candidates)
+		   :fuzzy-match t
+		   :action (lambda (candidate)
+			     (setq helm--treemacs-last-candidate
+				   (treemacs-workspace->name
+				    (treemacs-current-workspace)))
+			     (treemacs-select-workspace-by-name candidate))
+		   )
 	:buffer "*helm treemacs*"))
 
 (provide 'init-treemacs)

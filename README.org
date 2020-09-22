@@ -6,12 +6,17 @@ my emacs configuration
 
 * Install emacs for windows
 
-https://www.gnu.org/savannah-checkouts/gnu/emacs/download.html
+  https://www.gnu.org/savannah-checkouts/gnu/emacs/download.html
 
 * Install dependencies
-** ripgrep
+** Ripgrep
    #+BEGIN_SRC 
    cargo install ripgrep
+   #+END_SRC
+   
+** The Silver Searcher
+   #+BEGIN_SRC 
+   scoop install ag
    #+END_SRC
 
 ** Golang

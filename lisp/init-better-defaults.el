@@ -7,6 +7,39 @@
   (scroll-bar-mode -1)
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
+;; Better variables
+(setq
+ apropos                      t
+ backup-by-copying            t
+ comint-prompt-read-only      t
+ compilation-always-kill      t
+ compilation-ask-about-save   nil
+ compilation-scroll-output    t
+ debug-on-error               t
+ delete-old-versions          t
+ history-length               1024
+ idle-update-delay            0.5
+ inhibit-startup-message      t
+ kept-new-versions            6
+ kept-old-versions            2
+ large-file-warning-threshold 100000000
+ vc-follow-symlinks           t
+ version-control              t
+ visible-bell                 0
+ font-lock-maximum-size       5000000
+ )
+
+;; Change default path
+(setq
+ ;; auto-save-file-name-transforms `((".*" ,(ucache "auto-save-list/") t))
+ auto-save-list-file-prefix     (ucache "auto-save-list/")
+ backup-directory-alist         `(("." . ,(ucache "backups")))
+ custom-file                    (ucache "custom.el")
+ desktop-dirname                (ucache "desktop")
+ recentf-save-file              (ucache "recentf")
+ save-place-file                (ucache "places")
+ savehist-file                  (ucache "savehist")
+ )
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (cua-mode 1)
@@ -49,38 +82,5 @@
 (defun set-bigger-spacing ()
   (setq-local default-text-properties '(line-spacing 0.20 line-height 1.20)))
 (hook-gross-modes #'set-bigger-spacing)
-
-;; Better variables
-(setq
- apropos                      t
- backup-by-copying            t
- comint-prompt-read-only      t
- compilation-always-kill      t
- compilation-ask-about-save   nil
- compilation-scroll-output    t
- debug-on-error               t
- delete-old-versions          t
- history-length               1024
- idle-update-delay            0.5
- inhibit-startup-message      t
- kept-new-versions            6
- kept-old-versions            2
- large-file-warning-threshold 100000000
- vc-follow-symlinks           t
- version-control              t
- visible-bell                 0
- font-lock-maximum-size       5000000
- )
-
-;; Change default path
-(setq
- custom-file                    (ucache "custom.el")
- desktop-dirname                (ucache "desktop")
- backup-directory-alist         `(("." . ,(ucache "backups")))
- recentf-save-file              (ucache "recentf")
- auto-save-file-name-transforms `((".*" ,(ucache "auto-save-list") t))
- save-place-file                (ucache "places")
- savehist-file                  (ucache "savehist")
- )
 
 (provide 'init-better-defaults)
