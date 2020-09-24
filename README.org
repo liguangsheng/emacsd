@@ -11,7 +11,7 @@ my emacs configuration
 * Install dependencies
 ** Ripgrep
    #+BEGIN_SRC 
-   cargo install ripgrep
+   scoop install ripgrep
    #+END_SRC
    
 ** The Silver Searcher

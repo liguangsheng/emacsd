@@ -1,6 +1,3 @@
-(use-package rg)
-(use-package ripgrep)
-
 (setq toggle-eshell--last-buffer "*scratch*")
 
 (defun toggle-eshell-project-root ()
@@ -20,19 +17,5 @@
   (projectile-mode +1)
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-
-(use-package helm-projectile
-  :init
-  (evil-leader/set-key
-    "P"   'helm-projectile
-    "pd"  'helm-projectile-find-dir
-    "pf"  'helm-projectile-find-file-dwim
-    "pp"  'helm-projectile-switch-project
-    "pr"  'helm-projectile-recentf
-    "psg" 'helm-projectile-grep
-    "psr" 'helm-projectile-rg
-    "pss" 'helm-projectile-ag
-    "pxe" 'helm-projectile-switch-to-eshell
-    ))
 
 (provide 'init-projectile)

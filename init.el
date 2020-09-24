@@ -27,6 +27,7 @@
  ;; 		         ("https" . "127.0.0.1:1080")))
  server-p t
  use-tabnine nil
+ prefer-completion-mechanism 'helm
  )
 
 ;; -----------------------------------------------------------------------------
@@ -38,7 +39,6 @@
 ;; Features
 (require 'init-features)
 (require 'init-evil)
-(require 'init-helm)
 (require 'init-yasnippet)
 (require 'init-company)
 (require 'init-projectile)
@@ -46,6 +46,8 @@
 (require 'init-treemacs)
 (require 'init-server)
 (require 'init-lsp)
+(cond ((equal prefer-completion-mechanism 'helm) (require 'init-helm))
+       (equal prefer-completion-mechanism 'ivy) (require 'init-ivy))
 
 ;; Major Modes
 (require 'init-bazel)

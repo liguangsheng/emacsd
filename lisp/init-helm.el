@@ -1,4 +1,3 @@
-;; helm
 (use-package helm
   :bind (("M-x" . 'helm-M-x)
 	 ("C-x b" . 'helm-mini))
@@ -14,15 +13,35 @@
     "ff" 'helm-find-files
     "fr" 'helm-recentf
     "hi" 'helm-imenu
-    "hr" 'helm-recentf
-    "hk" 'helm-show-kill-ring
+    "hy" 'helm-show-kill-ring
     ))
+
+(use-package helm-icons
+  :config (helm-icons-enable))
 
 (use-package helm-themes)
 
 (use-package helm-describe-modes
   :bind ([remap describe-mode] . #'helm-describe-modes))
 
-(use-package helm-rg)
+(use-package helm-rg
+  :config (setq helm-rg-default-directory 'git-root))
+
+(use-package helm-swoop
+  :bind (("C-s" . 'helm-swoop)))
+
+(use-package helm-projectile
+  :init
+  (evil-leader/set-key
+    "P"   'helm-projectile
+    "pd"  'helm-projectile-find-dir
+    "pf"  'helm-projectile-find-file-dwim
+    "pp"  'helm-projectile-switch-project
+    "pr"  'helm-projectile-recentf
+    "psg" 'helm-projectile-grep
+    "psr" 'helm-projectile-rg
+    "pss" 'helm-projectile-ag
+    "pxe" 'helm-projectile-switch-to-eshell
+    ))
 
 (provide 'init-helm)
