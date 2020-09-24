@@ -2,6 +2,9 @@
   :init (setq ivy-height 30)
   :bind (("M-x"   . 'counsel-M-x)
 	 ("C-x b" . 'counsel-switch-buffer)
+	 ("C-h v" . 'counsel-describe-variable)
+	 ("C-h f" . 'counsel-describe-function)
+	 ("C-x c b" . 'ivy-resume)
 	 ("C-s"   . 'swiper))
   :config
   (with-eval-after-load "evil-leader"

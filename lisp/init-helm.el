@@ -1,6 +1,7 @@
 (use-package helm
   :bind (("M-x" . 'helm-M-x)
 	 ("C-x b" . 'helm-mini))
+
   :init
   (customize-set-variable 'helm-ff-lynx-style-map t)
   (customize-set-variable 'helm-imenu-lynx-style-map t)
@@ -38,10 +39,23 @@
     "pf"  'helm-projectile-find-file-dwim
     "pp"  'helm-projectile-switch-project
     "pr"  'helm-projectile-recentf
+    "pb"  'helm-projectile-switch-to-buffer
     "psg" 'helm-projectile-grep
     "psr" 'helm-projectile-rg
     "pss" 'helm-projectile-ag
     "pxe" 'helm-projectile-switch-to-eshell
     ))
+
+(use-package ace-jump-helm-line
+  :config
+  (with-eval-after-load "helm"
+    (define-key helm-map (kbd "C-'") 'ace-jump-helm-line)))
+
+(use-package helm-gitignore)
+
+(use-package helm-xref)
+
+(use-package helm-ls-git
+  :bind (("C-x C-d" . 'helm-browse-project)))
 
 (provide 'init-helm)
