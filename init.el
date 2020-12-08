@@ -64,6 +64,7 @@
 (require 'init-rust)
 (require 'init-typescript)
 (require 'init-yaml)
+(require 'init-toml)
 
 (require 'init-keybindings)
 (require 'init-fonts)

@@ -5,4 +5,7 @@
 (use-package toml-mode
   :mode (("\\.toml\\'" . toml-mode)))
 
+(use-package yaml-mode
+  :mode (("\\.ya?ml\\'" . yaml-mode)))
+
 (provide 'init-yaml)
