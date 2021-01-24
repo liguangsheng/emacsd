@@ -27,4 +27,15 @@
 (defun ucache (filename)
   (expand-file-name filename user-emacs-cache-directory))
 
+(defun u-site-lisp (filename)
+  (expand-file-name filename user-emacs-site-lisp-directory))
+
+(setq *mac* (eq system-type 'darwin)
+      *win64* (eq system-type 'windows-nt)
+      *cygwin* (eq system-type 'cygwin)
+      *linux* (or (eq system-type 'gnu/linux) (eq system-type 'linux))
+      *emacs26* (>= emacs-major-version 26)
+      *emacs27* (>= emacs-major-version 27)
+      *nomoney* ())
+
 (provide 'init-core)

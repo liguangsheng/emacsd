@@ -1,21 +1,4 @@
-(use-package helm
-  :bind (("M-x" . 'helm-M-x)
-	 ("C-x b" . 'helm-mini))
-
-  :init
-  (customize-set-variable 'helm-ff-lynx-style-map t)
-  (customize-set-variable 'helm-imenu-lynx-style-map t)
-  (customize-set-variable 'helm-semantic-lynx-style-map t)
-  (customize-set-variable 'helm-occur-use-ioccur-style-keys t)
-  (customize-set-variable 'helm-grep-use-ioccur-style-keys t)
-
-  (evil-leader/set-key
-    "bb" 'helm-mini
-    "ff" 'helm-find-files
-    "fr" 'helm-recentf
-    "hi" 'helm-imenu
-    "hy" 'helm-show-kill-ring
-    ))
+(use-package helm)
 
 (use-package helm-icons
   :config (helm-icons-enable))
@@ -28,23 +11,7 @@
 (use-package helm-rg
   :config (setq helm-rg-default-directory 'git-root))
 
-(use-package helm-swoop
-  :bind (("C-s" . 'helm-swoop)))
-
-(use-package helm-projectile
-  :init
-  (evil-leader/set-key
-    "P"   'helm-projectile
-    "pd"  'helm-projectile-find-dir
-    "pf"  'helm-projectile-find-file-dwim
-    "pp"  'helm-projectile-switch-project
-    "pr"  'helm-projectile-recentf
-    "pb"  'helm-projectile-switch-to-buffer
-    "psg" 'helm-projectile-grep
-    "psr" 'helm-projectile-rg
-    "pss" 'helm-projectile-ag
-    "pxe" 'helm-projectile-switch-to-eshell
-    ))
+(use-package helm-swoop)
 
 (use-package ace-jump-helm-line
   :config
@@ -57,5 +24,19 @@
 
 (use-package helm-ls-git
   :bind (("C-x C-d" . 'helm-browse-project)))
+
+(use-package helm-posframe
+  :if prefer-posframe
+  :init (setq helm-posframe-parameters
+	      '((left-fringe . 10)
+		(right-fringe . 10)))
+  :config
+  (helm-posframe-enable))
+
+(use-package helm-company)
+
+;; (use-package helm-lsp
+;;   :config
+;;   (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
 
 (provide 'init-helm)

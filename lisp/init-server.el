@@ -1,20 +1,17 @@
-;; server
-(defvar server-p nil
-  "Do you want start a emacs server")
+;; init-server.el
 
 (setq server-socket-dir (ucache "server")
       server-auth-dir   (ucache "server")
       server-name       "server")
 
 (defun emacs-server-exist-p ()
-  (file-exist-p (server-socket-path)))
+  (file-exists-p (expand-file-name server-name server-socket-dir)))
 
 (defun restart-emacs-server ()
   (interactive)
   (server-force-delete)
   (server-start))
 
-(when server-p
-  (restart-emacs-server))
+(unless (emacs-server-exist-p) (server-start))
 
 (provide 'init-server)

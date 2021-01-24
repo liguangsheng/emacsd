@@ -2,13 +2,17 @@
 ;;; Commentary:
 ;;; Code:
 
+(use-package dash)
 (use-package shut-up)
+(when prefer-posframe (use-package posframe))
+(use-package winner
+  :config (winner-mode 1))
 
-(use-package restart-emacs
-  :bind (("C-c q r" . restart-emacs))
-  :init
-  (with-eval-after-load "evil-leader"
-    (evil-leader/set-key "qr" 'restart-emacs)))
+(use-package restart-emacs)
+
+(use-package default-text-scale
+  :commands (default-text-scale-increase default-text-scale-decrease default-text-scale-reset)
+  :custom ((default-text-scale-amount 5)))
 
 ;; 智能括号
 (defvar smartparens-p nil)
@@ -30,42 +34,18 @@
   :config
   (when smooth-scrolling-p (smooth-scrolling-mode 1)))
 
-(use-package fill-column-indicator
-  :init (setq fci-rule-column 120)
-  (add-hook 'prog-mode-hook #'fci-mode))
+;; 这个feature可能会影响company的候选框的显示
+;; (use-package fill-column-indicator
+;;   :init (setq fci-rule-column 120)
+;;   (add-hook 'prog-mode-hook #'fci-mode))
 
 ;; 扩展选择区域
-(use-package expand-region
-  :bind (("C-c e p" . er/mark-inside-pairs)
-	 ("C-c e q" . er/mark-inside-quotes)
-	 ("C-c e u" . er/mark-url)
-	 ("C-c e e" . er/mark-email)
-	 ("C-c e a" . er/mark-text-paragraph)
-	 ("C-c e v" . er/expand-region)
-	 ("C-c v"   . er/expand-region))
-  :init
-  (with-eval-after-load "evil-leader"
-    (evil-leader/set-key
-      "ep" 'er/mark-inside-pairs
-      "eq" 'er/mark-inside-quotes
-      "eu" 'er/mark-url
-      "ee" 'er/mark-email
-      "ea" 'er/mark-text-paragraph
-      "ev" 'er/expand-region
-      "v" 'er/expand-region
-      )))
+(use-package expand-region)
 
 ;; 跳转
 (use-package avy
-  :bind (("C-c SPC" . avy-goto-word-1)
-	 ("C-c l"   . avy-goto-line))
   :init
-  (avy-setup-default)
-  (with-eval-after-load "evil-leader"
-    (evil-leader/set-key
-      "SPC" 'avy-goto-word-1
-      "l"   'avy-goto-line
-      )))
+  (avy-setup-default))
 
 ;; emoji
 (use-package emojify
@@ -93,10 +73,9 @@
   :init (highlight-symbol-mode))
 
 ;; 高亮当前行
-;; (use-package hl-line
-;;   :ensure nil
-;;   :custom-face (hl-line ((t (:extend t)))) ; FIXME: compatible with 27
-;;   :hook (after-init . global-hl-line-mode))
+(use-package hl-line
+  :custom-face (hl-line ((t (:extend t)))) ; FIXME: compatible with 27
+  :hook (after-init . global-hl-line-mode))
 
 ;; 高亮对应的paren
 (use-package paren
@@ -153,28 +132,8 @@ FACE defaults to inheriting from default and highlight."
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :config (setq doom-modeline-height 25
-		doom-modeline-bar 3
-		doom-modeline-buffer-file-name-style 'relative-to-project
-		doom-modeline-icon t
-		doom-modeline-major-mode-icon t
-		))
-
 (use-package vi-tilde-fringe
   :config
   (global-vi-tilde-fringe-mode))
-
-(use-package which-key
-  :init
-  (setq which-key-popup-type 'side-window
-	which-key-side-window-location 'bottom
-	which-key-idle-delay 0.4
-	which-key-separator " → "
-	which-key-prefix-prefix "+"
-	which-key-side-window-max-heght 0.25)
-  :config
-  (which-key-mode 1))
 
 (provide 'init-features)

@@ -3,40 +3,30 @@
 ;;; Code:
 
 (use-package go-mode
+  :mode "\\.go\\'"
   :hook (go-mode . go-mode-hook-func)
   :bind (:map go-mode-map
 	      ("C-c d d" . godef-describe)
 	      ("C-c d p" . godoc-at-point)
 	      ("C-c r u" . go-remove-unused-imports))
+
+
   :init
   ;; Copy system environment variables
   (when (memq window-system '(mac ns x))
     (dolist (var '("GOPATH" "GO15VENDOREXPERIMENT"))
       (unless (getenv var)
 	(exec-path-from-shell-copy-env var))))
-  :config
-  ;; Prefer "goreturns" as format tool
-  (when (executable-find "goreturns")
-    (setq gofmt-command "goreturns"))
 
   (defun go-mode-hook-func ()
-    ;; 保存buffer之前格式化文件
-    (add-hook 'before-save-hook 'gofmt-before-save t)
+    ;; Prefer "goreturns" as format tool
+    (when (executable-find "goreturns")
+      (setq gofmt-command "goreturns"))
 
-    (require 'lsp-go)
-
-    ;; eyes and hands comfort
+    ;; Eyes and hands comfort
     (subword-mode 1)
-    (setq tab-width 4)
-    (setq indent-tabs-mode 1)
-
-    (evil-leader/set-key
-      "mdd" 'godef-describe
-      "mdp" 'godoc-at-point
-      "mru" 'go-remove-unused-imports)
-
-    ;; (bind-key "s-]" 'godef-jump go-mode-map)
-    ;; (bind-key "s-[" 'pop-tag-mark go-mode-map)
+    (setq tab-width 4
+	  indent-tabs-mode 1)
     ))
 
 (use-package flycheck-golangci-lint
@@ -75,10 +65,11 @@
 	      ([remap xref-find-definitions] . go-guru-definition)
 	      ([remap xref-find-references] . go-guru-referrers)))
 
-(with-eval-after-load 'company
-  (use-package company-go
-    :defines company-backends
-    :init (cl-pushnew 'company-go company-backends)))
+(use-package company-go
+  :hook (go-mode . company-go/go-mode-hook-func)
+  :init
+  (defun company-go/go-mode-hook-func ()
+    (cl-pushnew 'company-go company-backends)))
 
 (with-eval-after-load 'projectile
   (use-package go-projectile

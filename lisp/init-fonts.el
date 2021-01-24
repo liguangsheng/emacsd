@@ -1,42 +1,60 @@
-(defvar en-fonts '("Menlo" 12 "Courier New" 12))
-(defvar cn-fonts '("PingFang SC" 12 "宋体" 12 "微软雅黑" 12))
+(defvar default-font-size 12)
+(defvar prefer-fonts '((
+			:if (eq system-type 'windows-nt)
+			:font-name "Source Code Pro for Powerline"
+			:font-size 12
+			:chinese-font-name "WenQuanYi Micro Hei"
+			:chinese-font-size 14
+			)
+		       (
+			:if (eq system-stype 'windows-nt)
+			:font-name "Consolas"
+			:font-size 12
+			:chinese-font-name "Microsoft YaHei UI"
+			:chinese-font-size 14)
+		       ))
 
-(defun font/exists-p (font-name)
+(defun font-exists-p (font-name)
   "Check if font exists."
-  (if (null (x-list-fonts font-name)) nil t))
+  (not (null (x-list-fonts font-name))))
 
-(defun font/use-en (font-name font-size)
-  "Set font for english."
-  (set-face-attribute 'default nil
-		      :font (format "%s:pixelsize=%d" font-name font-size)
-		      :weight 'normal))
+(defun use-font (&rest args)
+  "Set font"
+  (unless (and (plist-member args :if) (not (plist-get args :if))) 
+    (let* ((en-font-name (plist-get args :font-name))
+	   (en-font-size (or (plist-get args :font-size) default-font-size))
+	   (cn-font-name (plist-get args :chinese-font-name))
+	   (cn-font-size (or (plist-get args :chinese-font-size) default-font-size)))
+      (and
+       (if en-font-name (when (font-exists-p en-font-name)
+       			  (set-face-attribute 'default nil
+       					      :font (format "%s:pixelsize=%d" en-font-name en-font-size)
+       					      :weight 'normal) t) t)
 
-(defun font/use-cn (font-name font-size)
-  "Set font for chinese."
-  (dolist (charset '(kana han symbol cjk-misc bopomofo))
-    (set-fontset-font (frame-parameter nil 'font) charset
-		      (font-spec :family font-name :size font-size))))
+       (if cn-font-name (when (font-exists-p cn-font-name)
+			  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+			    (set-fontset-font (frame-parameter nil 'font) charset
+					      (font-spec :family cn-font-name :size cn-font-size))) t) t)
+       ))))
 
-(defun font/use-list (font-list font-func)
-  "Search font in font-list, use it if exists."
-  (unless (null font-list)
-    (let ((font-name (car font-list))
-	  (font-size (cadr font-list)))
-      (if (font/exists-p font-name)
-	  (funcall font-func font-name font-size)
-	(font/use-list (cddr font-list) font-func)))))
+(defun use-font-fallback (font-list)
+  "Set fonts fallback"
+  (catch 'finish
+    (dolist (font font-list)
+      (print font)
+      (if (apply 'use-font font) (throw 'finish t)))))
 
-(defun font/use-en-list (font-list)
-  (font/use-list font-list 'font/use-en))
+;; 春眠不觉晓，处处闻啼鸟
+;; abcdefghijklmnopqrstuvwxyz
+;; ABCDEFGHIJKLMNOPQRSTUVWXYZ
+;; (use-font
+;;  :font-name "Go Mono for Powerline"
+;;  :font-size 12
+;;  :chinese-font-name "WenQuanYi Micro Hei"
+;;  :chinese-font-size 12
+;;  )
 
-(defun font/use-cn-list (font-list)
-  (font/use-list font-list 'font/use-cn))
-
-(defun init-font ()
-  (when (display-graphic-p)
-    (font/use-en-list en-fonts)
-    (font/use-cn-list cn-fonts)))
-
-(init-font)
+(add-hook 'after-init-hook (lambda () (use-font-fallback prefer-fonts)))
 
 (provide 'init-fonts)
+

@@ -1,5 +1,5 @@
 (use-package company
-  :defer nil
+  :init (add-hook 'after-init-hook 'global-company-mode)
   :config
   (setq company-tooltip-align-annotations t ; aligns annotation to the right
 	company-tooltip-limit 24            ; bigger popup window
@@ -9,7 +9,6 @@
 	company-require-match nil
 	company-dabbrev-ignore-case nil
 	company-dabbrev-downcase nil)
-  (add-hook 'after-init-hook 'global-company-mode)
   ;; Nicer looking faces
   (custom-set-faces
    '(company-tooltip-common
@@ -17,10 +16,15 @@
    '(company-tooltip-common-selection
      ((t (:inherit company-tooltip-selection :weight bold :underline nil))))))
 
-(use-package helm-company)
+(use-package company-quickhelp
+  :config (company-quickhelp-mode 1))
 
 (when use-tabnine
   (use-package company-tabnine))
 
+(when prefer-posframe
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1)))
 
 (provide 'init-company)

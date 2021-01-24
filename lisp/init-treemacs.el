@@ -12,8 +12,7 @@
       "tp" 'treemacs-add-and-display-current-project
       "ta" 'treemacs-find-tag))
   (setq treemacs-width 50)
-  :bind (([f8] . treemacs)
-	 ("M-0"       . treemacs-select-window)
+  :bind (("M-0"       . treemacs-select-window)
 	 ("C-x t 1"   . treemacs-delete-other-windows)
 	 ("C-x t t"   . treemacs)
 	 ("C-x t B"   . treemacs-bookmark)
@@ -21,76 +20,59 @@
 	 ("C-x t M-t" . treemacs-find-tag)
 	 :map treemacs-mode-map
 	 ([mouse-1]   . treemacs-single-click-expand-action))
+
   :config
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
-  (treemacs-fringe-indicator-mode t)
-  (pcase (cons (not (null (executable-find "git")))
-	       (not (null treemacs-python-executable)))
-    (`(t . t)
-     (treemacs-git-mode 'deferred))
-    (`(t . _)
-     (treemacs-git-mode 'simple)))
-  (treemacs-resize-icons 12)
-  (when (fboundp 'doom-themes-treemacs-config)
-    (doom-themes-treemacs-config)))
+  (dolist (tface '(treemacs-file-face
+		   treemacs-directory-face
+		   treemacs-git-modified-face
+		   treemacs-git-added-face
+		   treemacs-git-renamed-face
+		   treemacs-git-untracked-face
+		   treemacs-git-unmodified-face
+		   treemacs-git-conflict-face
+		   treemacs-git-ignored-face
+		   ))
+    (let ((font "Microsoft YaHei UI"))
+      (if (font-exists-p font)
+	(set-face-attribute tface nil
+			    :font (format "%s:pixelsize=%d" font 12)
+			    :height 90
+			    :weight 'normal)
+	(set-face-attribute tface nil :height 90)
+	)))
 
-(use-package treemacs-evil
-  :after treemacs evil
-  :ensure t)
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+		 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+    ;; (treemacs-resize-icons 12)
+    )
 
-(use-package treemacs-projectile
-  :after treemacs projectile
-  :ensure t)
+  (use-package treemacs-evil
+    :after treemacs evil
+    :ensure t)
 
-(use-package treemacs-icons-dired
-  :after treemacs dired
-  :ensure t
-  :config (treemacs-icons-dired-mode))
+  (use-package treemacs-projectile
+    :after treemacs projectile
+    :ensure t)
 
-(use-package treemacs-magit
-  :after treemacs magit
-  :ensure t)
+  (use-package treemacs-icons-dired
+    :after treemacs dired
+    :ensure t
+    :config (treemacs-icons-dired-mode))
 
-(use-package treemacs-persp ;;treemacs-persective if you use perspective.el vs. persp-mode
-  :after treemacs persp-mode ;;or perspective vs. persp-mode
-  :ensure t
-  :config (treemacs-set-scope-type 'Perspectives))
+  (use-package treemacs-magit
+    :after treemacs magit
+    :ensure t)
 
-(setq helm--treemacs-last-candidate "Default")
+  (use-package treemacs-persp ;;treemacs-persective if you use perspective.el vs. persp-mode
+    :after treemacs persp-mode ;;or perspective vs. persp-mode
+    :ensure t
+    :config (treemacs-set-scope-type 'Perspectives))
 
-(defun helm--treemacs-workspace-candidates ()
-  (move-to-front
-   (cl-loop for ws in (treemacs-workspaces) collect (treemacs-workspace->name
-						     ws))
-   helm--treemacs-last-candidate))
-
-(defun treemacs-find-workspace (name)
-  (seq-find
-   (lambda (x) (string-equal name (treemacs-workspace->name x)))
-   (treemacs-workspaces)))
-
-(defun treemacs-select-workspace (ws)
-  (setf (treemacs-current-workspace) ws)
-  (treemacs--invalidate-buffer-project-cache)
-  (treemacs--rerender-after-workspace-change)
-  (run-hooks 'treemacs-switch-workspace-hook))
-
-(defun treemacs-select-workspace-by-name (name)
-  (treemacs-select-workspace (treemacs-find-workspace name))
-  (message "treemacs select workspace: %s" name))
-
-(defun helm-treemacs-workspace ()
-  (interactive)
-  (helm :sources (helm-build-sync-source "Helm-Treemacs"
-		   :candidates (helm--treemacs-workspace-candidates)
-		   :fuzzy-match t
-		   :action (lambda (candidate)
-			     (setq helm--treemacs-last-candidate
-				   (treemacs-workspace->name
-				    (treemacs-current-workspace)))
-			     (treemacs-select-workspace-by-name candidate))
-		   )
-	:buffer "*helm treemacs*"))
-
-(provide 'init-treemacs)
+  (provide 'init-treemacs)

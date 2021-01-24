@@ -7,8 +7,7 @@
 
 (use-package evil-leader
   :config
-  (global-evil-leader-mode)
-  (evil-leader/set-leader "<SPC>"))
+  (global-evil-leader-mode))
 
 (use-package evil-surround
   :config (global-evil-surround-mode 1))

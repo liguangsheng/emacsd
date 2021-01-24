@@ -1,4 +1,6 @@
-;; init.el --- Emacs configuration -*- lexical-binding: t; -*- ;;; Commentary:
+;;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
+;;
+;;; Commentary:
 ;; This file bootstraps the configuration, which is divided into
 ;; a number of other files.
 
@@ -14,20 +16,26 @@
  maximize-frame-at-start-p t
  ;; 平滑滚动
  smooth-scrolling-p t
- ;; 中英文字体
+ ;; Prefer fonts
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash(expand-file-name "")
- en-fonts '("Inconsolata for Powerline" 14  "Source Code Pro" 12 "Menlo" 12
-	    "Courier New" 12)
- cn-fonts '("华文细黑" 12 "宋体" 12 "PingFang SC" 12 "微软雅黑" 12)
- ;; 使用主题
- theme 'doom-Iosvkem
+ prefer-fonts '((;; windows font setting
+		 :if (eq system-type 'windows-nt)
+		 :font-name "Go Mono for Powerline"
+		 :font-size 12
+		 :chinese-font-name "WenQuanYi Micro Hei"
+		 :chinese-font-size 14
+		 ))
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		         ("https" . "127.0.0.1:1080")))
- server-p t
  use-tabnine nil
- prefer-completion-mechanism 'helm
+ ;; use posframe if possible
+ prefer-posframe t
+ ;; use all-the-icons if possible
+ prefer-icons t
+ ;; available hydra evil-leader
+ prefer-leader 'hydra
  )
 
 ;; -----------------------------------------------------------------------------
@@ -37,17 +45,25 @@
 (require 'init-packages)
 
 ;; Features
+(require 'init-benchmark-init)
 (require 'init-features)
+(require 'init-icons)
 (require 'init-evil)
+(require 'init-hydra)
 (require 'init-yasnippet)
 (require 'init-company)
 (require 'init-projectile)
 (require 'init-flycheck)
 (require 'init-treemacs)
 (require 'init-server)
+(require 'init-which-key)
+(require 'init-modeline)
 (require 'init-lsp)
-(cond ((equal prefer-completion-mechanism 'helm) (require 'init-helm))
-       (equal prefer-completion-mechanism 'ivy) (require 'init-ivy))
+(require 'init-helm)
+(require 'init-ivy)
+(require 'init-keybindings)
+(require 'init-fonts)
+(require 'init-themes)
 
 ;; Major Modes
 (require 'init-bazel)
@@ -65,11 +81,8 @@
 (require 'init-typescript)
 (require 'init-yaml)
 (require 'init-toml)
-
-(require 'init-keybindings)
-(require 'init-fonts)
-(require 'init-themes)
-
+(require 'init-powershell)
+(require 'init-graphql)
 
 ;; Load custom file
 (when (file-readable-p custom-file) (load custom-file))
