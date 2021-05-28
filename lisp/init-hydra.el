@@ -8,8 +8,8 @@
   (setq hydra-posframe-border-width 2
 	hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-center
 	hydra-posframe-parameters '((left-fringe . 5)(right-fringe . 5)))
-  ;; :custom-face (hydra-posframe-border-face ((t (:background "#bf616a"))))
-  ;; :custom-face (hydra-posframe-face ((t (:background "#3b4252"))))
+  :custom-face (hydra-posframe-border-face ((t (:background "#bf616a"))))
+  :custom-face (hydra-posframe-face ((t (:background "#3b4252"))))
   )
 
 (use-package major-mode-hydra
@@ -26,3 +26,4 @@
   (advice-add #'pretty-hydra--get-heads :filter-return #'config-hydras--add-quit-bindings))
 
 (provide 'init-hydra)
+

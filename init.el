@@ -1,10 +1,12 @@
-;;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
+;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;; This file bootstraps the configuration, which is divided into
 ;; a number of other files.
 
 ;;; Code:
+
+(require 'init-core (concat user-emacs-directory "lisp/init-core"))
 
 ;;; ----------------------------------------------------------------------------
 ;;; Quick Settings
@@ -22,29 +24,38 @@
  prefer-fonts '((;; windows font setting
 		 :if (eq system-type 'windows-nt)
 		 :font-name "Go Mono for Powerline"
+		 ;; :font-name "Inconsolata for Powerline"
 		 :font-size 12
 		 :chinese-font-name "WenQuanYi Micro Hei"
-		 :chinese-font-size 14
+		 :chinese-font-size 12
 		 ))
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		         ("https" . "127.0.0.1:1080")))
- use-tabnine nil
+ use-tabnine *i-am-rich*
  ;; use posframe if possible
- prefer-posframe t
+ prefer-posframe nil
  ;; use all-the-icons if possible
  prefer-icons t
- ;; available hydra evil-leader
+ ;; available: hydra evil-leader
  prefer-leader 'hydra
+ ;; load prefer-theme if exists
+ ;; recommend: 'printed for light, 'wombat for dark
+ prefer-theme 'printed
+ ;; org files directory
+ org-directory "~/sync/org"
  )
 
+(when *win64*
+  (setq org-directory "e:/sync/org/"))
+
 ;; -----------------------------------------------------------------------------
-(require 'init-core (concat user-emacs-directory "lisp/init-core"))
 (require 'init-my-functions)
 (require 'init-better-defaults)
 (require 'init-packages)
 
 ;; Features
+(require 'init-fonts)
 (require 'init-benchmark-init)
 (require 'init-features)
 (require 'init-icons)
@@ -52,6 +63,7 @@
 (require 'init-hydra)
 (require 'init-yasnippet)
 (require 'init-company)
+(require 'init-tabnine)
 (require 'init-projectile)
 (require 'init-flycheck)
 (require 'init-treemacs)
@@ -59,11 +71,10 @@
 (require 'init-which-key)
 (require 'init-modeline)
 (require 'init-lsp)
-(require 'init-helm)
 (require 'init-ivy)
 (require 'init-keybindings)
-(require 'init-fonts)
 (require 'init-themes)
+(require 'init-scratch)
 
 ;; Major Modes
 (require 'init-bazel)
@@ -85,7 +96,7 @@
 (require 'init-graphql)
 
 ;; Load custom file
-(when (file-readable-p custom-file) (load custom-file))
+(when (and custom-file (file-readable-p custom-file) (load custom-file)))
 
 ;;; ----------------------------------------------------------------------------
 ;; Experimental:

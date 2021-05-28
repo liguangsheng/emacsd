@@ -16,4 +16,6 @@
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
 
+;; 如果用Server模式启动Client，应该在这里设置frame的字体
+
 ;; early-init.el ends here

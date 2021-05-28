@@ -1,11 +1,7 @@
 ;; init-server.el
 
-(setq server-socket-dir (ucache "server")
-      server-auth-dir   (ucache "server")
-      server-name       "server")
-
 (defun emacs-server-exist-p ()
-  (file-exists-p (expand-file-name server-name server-socket-dir)))
+  (file-exists-p (expand-file-name (concat "server/" server-name) user-emacs-directory)))
 
 (defun restart-emacs-server ()
   (interactive)

@@ -4,6 +4,10 @@
 
 my emacs configuration
 
+* 目录结构
+
+- README.org 当前文件
+
 * Install emacs for windows
 
   https://www.gnu.org/savannah-checkouts/gnu/emacs/download.html
@@ -40,7 +44,7 @@ my emacs configuration
 
 ** Win10
 *** 启动server
-    - (推荐)在配置中添加~(server-start)~
+     (推荐)在配置中添加~(server-start)~
     - 直接使用~emacs,exe --daemon~启动
 
 *** 启动emacsclient

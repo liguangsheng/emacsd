@@ -5,37 +5,34 @@
 ;;; Code:
 (use-package lsp-mode
   :diminish lsp-mode
-  :custom-face
-  (lsp-headerline-breadcrumb-path-error-face
-   ((t :underline (:style line :color ,(face-foreground 'error))
-       :inherit lsp-headerline-breadcrumb-path-face)))
-  (lsp-headerline-breadcrumb-path-warning-face
-   ((t :underline (:style line :color ,(face-foreground 'warning))
-       :inherit lsp-headerline-breadcrumb-path-face)))
-  (lsp-headerline-breadcrumb-path-info-face
-   ((t :underline (:style line :color ,(face-foreground 'success))
-       :inherit lsp-headerline-breadcrumb-path-face)))
-  (lsp-headerline-breadcrumb-path-hint-face
-   ((t :underline (:style line :color ,(face-foreground 'success))
-       :inherit lsp-headerline-breadcrumb-path-face)))
+  ;; :custom-face
+  ;; (lsp-headerline-breadcrumb-path-error-face
+  ;;  ((t :underline (:style line :color ,(face-foreground 'error))
+  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
+  ;; (lsp-headerline-breadcrumb-path-warning-face
+  ;;  ((t :underline (:style line :color ,(face-foreground 'warning))
+  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
+  ;; (lsp-headerline-breadcrumb-path-info-face
+  ;;  ((t :underline (:style line :color ,(face-foreground 'success))
+  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
+  ;; (lsp-headerline-breadcrumb-path-hint-face
+  ;;  ((t :underline (:style line :color ,(face-foreground 'success))
+  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
 
-  (lsp-headerline-breadcrumb-symbols-error-face
-   ((t :inherit lsp-headerline-breadcrumb-symbols-face
-       :underline (:style line :color ,(face-foreground 'error)))))
-  (lsp-headerline-breadcrumb-symbols-warning-face
-   ((t :inherit lsp-headerline-breadcrumb-symbols-face
-       :underline (:style line :color ,(face-foreground 'warning)))))
-  (lsp-headerline-breadcrumb-symbols-info-face
-   ((t :inherit lsp-headerline-breadcrumb-symbols-face
-       :underline (:style line :color ,(face-foreground 'success)))))
-  (lsp-headerline-breadcrumb-symbols-hint-face
-   ((t :inherit lsp-headerline-breadcrumb-symbols-face
-       :underline (:style line :color ,(face-foreground 'success)))))
+  ;; (lsp-headerline-breadcrumb-symbols-error-face
+  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
+  ;;      :underline (:style line :color ,(face-foreground 'error)))))
+  ;; (lsp-headerline-breadcrumb-symbols-warning-face
+  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
+  ;;      :underline (:style line :color ,(face-foreground 'warning)))))
+  ;; (lsp-headerline-breadcrumb-symbols-info-face
+  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
+  ;;      :underline (:style line :color ,(face-foreground 'success)))))
+  ;; (lsp-headerline-breadcrumb-symbols-hint-face
+  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
+  ;;      :underline (:style line :color ,(face-foreground 'success)))))
 
-  :hook ((prog-mode . (lambda ()
-			(unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
-			  (lsp-deferred))))
-	 (lsp-mode . (lambda ()
+  :hook ((lsp-mode . (lambda ()
 		       ;; Integrate `which-key'
 		       (lsp-enable-which-key-integration)
 
@@ -49,8 +46,8 @@
 	      ([remap xref-find-references] . lsp-find-references))
 
   :bind (("M-b" . xref-find-definitions)
-  	 ("M-]" . xref-find-definitions)
-  	 ("M-[" . xref-pop-marker-stack))
+	 ("M-]" . xref-find-definitions)
+	 ("M-[" . xref-pop-marker-stack))
 
   :init
   (setq create-lockfiles nil
@@ -58,7 +55,6 @@
 	lsp-inhibit-message t
 	lsp-message-project-root-warning t
 	lsp-prefer-flymake nil      ; Use lsp-ui and flycheck
-	lsp-session-file (ucache ".lsp-session-v1")
 	lsp-keep-workspace-alive nil
 	lsp-signature-auto-activate nil
 	lsp-modeline-code-actions-enable nil
@@ -90,8 +86,10 @@
 (with-eval-after-load 'treemacs
   (use-package lsp-treemacs))
 
-(use-package company-lsp
-  :init (setq company-lsp-cache-candidates 'auto))
+;; (use-package company-lsp
+;;   :init (setq company-lsp-cache-candidates 'auto)
+;;   (push 'company-lsp company-backends)
+;;   )
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)

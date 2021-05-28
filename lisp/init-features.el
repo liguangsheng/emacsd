@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
 (use-package dash)
 (use-package shut-up)
 (when prefer-posframe (use-package posframe))
@@ -49,7 +52,7 @@
 
 ;; emoji
 (use-package emojify
-  :config (global-emojify-mode))
+  :hook (after-init . global-emojify-mode))
 
 ;; 彩虹分隔符
 (use-package rainbow-delimiters
@@ -133,7 +136,7 @@ FACE defaults to inheriting from default and highlight."
     (exec-path-from-shell-initialize)))
 
 (use-package vi-tilde-fringe
-  :config
+  :init
   (global-vi-tilde-fringe-mode))
 
 (provide 'init-features)

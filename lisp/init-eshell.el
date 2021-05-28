@@ -1,6 +1,3 @@
-(make-directory-unless-exists (ucache "eshell"))
-(setq eshell-directory-name (ucache "eshell"))
-
 (use-package eshell-git-prompt
   :config
   (eshell-git-prompt-use-theme 'powerline))

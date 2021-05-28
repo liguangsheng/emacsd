@@ -8,29 +8,17 @@
 (use-package github-modern-theme :defer t)
 (use-package noctilux-theme :defer t)
 (use-package firecode-theme :defer t)
-(use-package apropospriate-theme :defer t)
 (use-package moe-theme :defer t)
 (use-package kaolin-themes :defer t)
 
-;; (defun final-theme ()
-;;   (cond
-;;    ((eq theme nil) default) 
-;;    ((or (eq theme 'random) (string-equal theme "random")) (random-theme))
-;;    (t theme)))
+(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/printed-theme")
 
-;; (defun load-theme-dwim ()
-;;   (interactive)
-;;   (let ((final-theme (final-theme)))
-;;     (load-theme final-theme t)
-;;     (message (format "load theme: %s" (symbol-name final-theme)))))
-
-;; (unless (eq theme 'default)
-;;   (load-theme-dwim))
+(defvar prefer-theme 'wombat)
 
 (add-hook 'after-init-hook
 	  (lambda ()
-	    (load-theme 'kaolin-galaxy t)
-	    (kaolin-treemacs-theme)
+	    (load-theme prefer-theme t)
+	    (kaolin-treemacs-theme) ;; for treemacs
 	    ))
 
 (provide 'init-themes)

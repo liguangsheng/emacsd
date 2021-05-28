@@ -8,9 +8,8 @@
   :bind (:map go-mode-map
 	      ("C-c d d" . godef-describe)
 	      ("C-c d p" . godoc-at-point)
-	      ("C-c r u" . go-remove-unused-imports))
-
-
+	      ("C-c r u" . go-remove-unused-imports)
+	      ("C-M-l" . gofmt))
   :init
   ;; Copy system environment variables
   (when (memq window-system '(mac ns x))
@@ -20,13 +19,14 @@
 
   (defun go-mode-hook-func ()
     ;; Prefer "goreturns" as format tool
-    (when (executable-find "goreturns")
-      (setq gofmt-command "goreturns"))
+    ;; (when (executable-find "goreturns")
+    ;;   (setq gofmt-command "goreturns"))
 
     ;; Eyes and hands comfort
     (subword-mode 1)
     (setq tab-width 4
 	  indent-tabs-mode 1)
+    (lsp-deferred)
     ))
 
 (use-package flycheck-golangci-lint
@@ -65,17 +65,11 @@
 	      ([remap xref-find-definitions] . go-guru-definition)
 	      ([remap xref-find-references] . go-guru-referrers)))
 
-(use-package company-go
-  :hook (go-mode . company-go/go-mode-hook-func)
-  :init
-  (defun company-go/go-mode-hook-func ()
-    (cl-pushnew 'company-go company-backends)))
-
-(with-eval-after-load 'projectile
-  (use-package go-projectile
-    :commands (go-projectile-mode go-projectile-switch-project)
-    :hook ((go-mode . go-projectile-mode)
-	   (projectile-after-switch-project . go-projectile-switch-project))))
+(use-package go-projectile
+  :after projectile
+  :commands (go-projectile-mode go-projectile-switch-project)
+  :hook ((go-mode . go-projectile-mode)
+	 (projectile-after-switch-project . go-projectile-switch-project)))
 
 (use-package go-add-tags)
 (use-package go-dlv)
@@ -86,5 +80,12 @@
 (use-package go-snippets)
 (use-package golint)
 (use-package govet)
+
+(use-package flycheck-gometalinter
+  :init
+  (setq flycheck-gometalinter-vendor t)
+  :config
+  (progn
+    (flycheck-gometalinter-setup)))
 
 (provide 'init-go)

@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(use-package bazel-mode
+(use-package bazel
   :mode (("WORKSPACE\\'" . bazel-mode)
 	 ("BUILD\\'" . bazel-mode)))
 

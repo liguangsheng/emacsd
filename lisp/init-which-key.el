@@ -16,7 +16,6 @@
   (which-key-mode 1))
 
 (use-package which-key-posframe
-  :disabled t
   :if prefer-posframe
   :init (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-center
 	      which-key-posframe-border-width 2

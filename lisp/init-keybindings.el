@@ -16,7 +16,8 @@
 (global-set-key (kbd "<f1> m")	'counsel-describe-map)
 (global-set-key (kbd "<f1> s")	'counsel-describe-symbol)
 (global-set-key (kbd "<f1> v")	'counsel-describe-variable)
-(global-set-key (kbd "<f8>")	'toggle-eshell-project-root)
+(global-set-key (kbd "<f8>")	'my/treemacs-select-window)
+(global-set-key (kbd "C-`")	'toggle-eshell-project-root)
 (global-set-key (kbd "C-/")	'comment-line)
 (global-set-key (kbd "C-M-l")	'indent-whole-buffer)
 (global-set-key (kbd "C-j")	'ace-window)
@@ -44,6 +45,10 @@
   (define-key evil-normal-state-map "u"	 'undo-tree-undo)
   (define-key evil-normal-state-map "U"	 'undo-tree-redo)
   (define-key evil-normal-state-map "gj" 'evil-join)
+  (define-key evil-normal-state-map (kbd "SPC") 'hydra-main/body)
+(define-key evil-normal-state-map (kbd "\\") 'hydra-main/body)
+(define-key evil-visual-state-map (kbd "SPC") 'hydra-main/body)
+(define-key evil-visual-state-map (kbd "\\") 'hydra-main/body)
 
   ;; Insert state
   (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
@@ -71,7 +76,6 @@
     "pd"	'counsel-projectile-find-dir
     "pf"	'counsel-projectile-find-file
     "pP"	'counsel-projectile-switch-project
-    "pr"	'helm-projectile-recentf
     "ps"	'counsel-projectile-rg
     "qq"	'save-buffers-kill-emacs
     "w SPC"	'ace-window
@@ -97,7 +101,6 @@
     "SPC c" "comment"
     "SPC e" "expand"
     "SPC f" "file"
-    "SPC h" "helm"
     "SPC m" "mode"
     "SPC p" "projectile"
     "SPC q" "quit"
@@ -276,12 +279,15 @@
    "Others"
    (("z" font-scale/body "font scale"))))
 
-(defvar prefer-leader 'hydra)
-(cond ((eq prefer-leader 'hydra)
-       (progn (define-key evil-normal-state-map (kbd "SPC") 'hydra-main/body)
-	      (define-key evil-visual-state-map (kbd "SPC") 'hydra-main/body)))
-      ((eq prefer-leader 'evil-leader)
-       (evil-leader/set-leader "<SPC>")))
+
+
+
+;; (defvar prefer-leader 'hydra)
+;; (cond ((eq prefer-leader 'hydra)
+;;        (progn (define-key evil-normal-state-map (kbd "SPC") 'hydra-main/body)
+;; 	      (define-key evil-visual-state-map (kbd "SPC") 'hydra-main/body)))
+;;       ((eq prefer-leader 'evil-leader)
+;;        (evil-leader/set-leader "<SPC>")))
 
 ;; (evil-leader/set-leader "<SPC>")
 ;; (global-set-key (kbd "<f2>") 'hydra-main/body)

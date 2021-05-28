@@ -1,15 +1,14 @@
-(defvar default-font-size 12)
-(defvar prefer-fonts '((
+(defvar default-font-size 12) (defvar prefer-fonts '((
 			:if (eq system-type 'windows-nt)
 			:font-name "Source Code Pro for Powerline"
-			:font-size 12
+			:font-size 14
 			:chinese-font-name "WenQuanYi Micro Hei"
 			:chinese-font-size 14
 			)
 		       (
 			:if (eq system-stype 'windows-nt)
 			:font-name "Consolas"
-			:font-size 12
+			:font-size 14
 			:chinese-font-name "Microsoft YaHei UI"
 			:chinese-font-size 14)
 		       ))
@@ -53,6 +52,10 @@
 ;;  :chinese-font-name "WenQuanYi Micro Hei"
 ;;  :chinese-font-size 12
 ;;  )
+
+(defun reset-font ()
+  (interactive)
+  (use-font-fallback prefer-fonts))
 
 (add-hook 'after-init-hook (lambda () (use-font-fallback prefer-fonts)))
 

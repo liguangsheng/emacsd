@@ -27,18 +27,8 @@
  version-control              t
  visible-bell                 0
  font-lock-maximum-size       5000000
- )
-
-;; Change default path
-(setq
- ;; auto-save-file-name-transforms `((".*" ,(ucache "auto-save-list/") t))
- auto-save-list-file-prefix     (ucache "auto-save-list/")
- backup-directory-alist         `(("." . ,(ucache "backups")))
- custom-file                    (ucache "custom.el")
- desktop-dirname                (ucache "desktop")
- recentf-save-file              (ucache "recentf")
- save-place-file                (ucache "places")
- savehist-file                  (ucache "savehist")
+ create-lockfiles             nil
+ custom-file                  "~/custom.el"
  )
 
 (defalias 'yes-or-no-p 'y-or-n-p)

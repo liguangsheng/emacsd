@@ -1,3 +1,5 @@
+(require 'subr-x)
+
 (defconst user-emacs-lisp-directory
   (expand-file-name "lisp/" user-emacs-directory)
   "Path to .emacs.d/lisp directory where init files exists.")
@@ -30,12 +32,25 @@
 (defun u-site-lisp (filename)
   (expand-file-name filename user-emacs-site-lisp-directory))
 
+;; OS Environment see http://ergoemacs.org/emacs_manual/elisp/System-Environment.html
 (setq *mac* (eq system-type 'darwin)
       *win64* (eq system-type 'windows-nt)
       *cygwin* (eq system-type 'cygwin)
       *linux* (or (eq system-type 'gnu/linux) (eq system-type 'linux))
       *emacs26* (>= emacs-major-version 26)
-      *emacs27* (>= emacs-major-version 27)
-      *nomoney* ())
+      *emacs27* (>= emacs-major-version 27))
+
+(defun windows-total-physical-memory ()
+  (/ (float (string-to-number 
+	     (nth 1 (split-string (shell-command-to-string "wmic computersystem get TotalPhysicalMemory") "\n"))))
+     1024 1024 1024))
+
+(setq total-physical-memory
+      (cond (*win64* (windows-total-physical-memory))))
+
+(setq *no-money-and=cry* (< total-physical-memory 32)
+      *i-am-rich* (> total-physical-memory 32))
 
 (provide 'init-core)
+
+;;; init-core.el ends here
