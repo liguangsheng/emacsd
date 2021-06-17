@@ -11,14 +11,15 @@
 (use-package moe-theme :defer t)
 (use-package kaolin-themes :defer t)
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/printed-theme")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/solo-jazz-emacs-theme")
 
 (defvar prefer-theme 'wombat)
 
-(add-hook 'after-init-hook
-	  (lambda ()
-	    (load-theme prefer-theme t)
-	    (kaolin-treemacs-theme) ;; for treemacs
-	    ))
+(when (display-graphic-p)
+  (add-hook 'after-init-hook
+	    (lambda ()
+	      (load-theme prefer-theme t)
+	      (kaolin-treemacs-theme) ;; for treemacs
+	      )))
 
 (provide 'init-themes)

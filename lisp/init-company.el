@@ -16,12 +16,7 @@
    '(company-tooltip-common-selection
      ((t (:inherit company-tooltip-selection :weight bold :underline nil))))))
 
-;; (use-package company-quickhelp
-;;   :config (company-quickhelp-mode 1))
-
-(when prefer-posframe
-  (use-package company-posframe
-    :config
-    (company-posframe-mode 0)))
+(use-package company-quickhelp
+  :config (company-quickhelp-mode 1))
 
 (provide 'init-company)

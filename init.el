@@ -9,13 +9,11 @@
 (require 'init-core (concat user-emacs-directory "lisp/init-core"))
 
 ;;; ----------------------------------------------------------------------------
-;;; Quick Settings
+;;; 快速配置
 
 (setq-default
  ;; 显示行号
  show-line-number-p t
- ;; 启动时窗口最大化
- maximize-frame-at-start-p t
  ;; 平滑滚动
  smooth-scrolling-p t
  ;; Prefer fonts
@@ -36,23 +34,27 @@
  ;; use posframe if possible
  prefer-posframe nil
  ;; use all-the-icons if possible
- prefer-icons t
+ prefer-icons (display-graphic-p)
  ;; available: hydra evil-leader
  prefer-leader 'hydra
- ;; load prefer-theme if exists
- ;; recommend: 'printed for light, 'wombat for dark
- prefer-theme 'printed
+ ;; 加载主题，如果存在的话
+ ;; 推荐: 白天用'solo-jazz, 夜间用'wombat
+ prefer-theme 'solo-jazz
+ ;; python 可执行文件地址
+ my/python-executable "python3"
  ;; org files directory
  org-directory "~/sync/org"
  )
 
 (when *win64*
-  (setq org-directory "e:/sync/org/"))
+  (setq org-directory "e:/sync/org/"
+	my/python-executable "C:\\Program Files\\Python39\\python.exe"
+	))
 
 ;; -----------------------------------------------------------------------------
 (require 'init-my-functions)
-(require 'init-better-defaults)
 (require 'init-packages)
+(require 'init-better-defaults)
 
 ;; Features
 (require 'init-fonts)
@@ -61,6 +63,7 @@
 (require 'init-icons)
 (require 'init-evil)
 (require 'init-hydra)
+(require 'init-ivy)
 (require 'init-yasnippet)
 (require 'init-company)
 (require 'init-tabnine)
@@ -71,7 +74,6 @@
 (require 'init-which-key)
 (require 'init-modeline)
 (require 'init-lsp)
-(require 'init-ivy)
 (require 'init-keybindings)
 (require 'init-themes)
 (require 'init-scratch)

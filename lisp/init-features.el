@@ -3,11 +3,11 @@
 ;;; Code:
 
 (use-package undo-tree
-  :config
-  (global-undo-tree-mode))
+  :hook (after-init . global-undo-tree-mode))
 (use-package dash)
 (use-package shut-up)
-(when prefer-posframe (use-package posframe))
+(use-package posframe
+  :if prefer-posframe)
 (use-package winner
   :config (winner-mode 1))
 

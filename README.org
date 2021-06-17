@@ -8,9 +8,14 @@ my emacs configuration
 
 - README.org 当前文件
 
-* Install emacs for windows
-
+* Install
+** windows
   https://www.gnu.org/savannah-checkouts/gnu/emacs/download.html
+** mac os
+   #+BEGIN_SRC
+	brew install --HEAD emacs-plus --with-emacs-27-branch --with-jansson --without-spacemacs-icon
+   #+END_SRC
+
 
 * Install dependencies
 ** Ripgrep
@@ -33,7 +38,6 @@ my emacs configuration
    #+BEGIN_SRC 
    rustup component add rust-src
    #+END_SRC
- 
 
 ** Python 
    #+BEGIN_SRC 

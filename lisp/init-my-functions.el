@@ -1,5 +1,3 @@
-(require 'cl)
-
 (defun hook-gross-modes (function &optional depth local)
   (add-hook 'prog-mode-hook        function depth local)
   (add-hook 'fundamental-mode-hook function depth local)

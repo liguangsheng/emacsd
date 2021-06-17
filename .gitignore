@@ -11,3 +11,6 @@ smex-items
 transient/
 history
 projectile-bookmarks.eld
+cache/
+projectile.cache
+.lsp-session-v1

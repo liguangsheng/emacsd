@@ -16,7 +16,7 @@
 (global-set-key (kbd "<f1> m")	'counsel-describe-map)
 (global-set-key (kbd "<f1> s")	'counsel-describe-symbol)
 (global-set-key (kbd "<f1> v")	'counsel-describe-variable)
-(global-set-key (kbd "<f8>")	'my/treemacs-select-window)
+;; (global-set-key (kbd "<f8>")	'my/treemacs-select-window)
 (global-set-key (kbd "C-`")	'toggle-eshell-project-root)
 (global-set-key (kbd "C-/")	'comment-line)
 (global-set-key (kbd "C-M-l")	'indent-whole-buffer)
@@ -46,67 +46,15 @@
   (define-key evil-normal-state-map "U"	 'undo-tree-redo)
   (define-key evil-normal-state-map "gj" 'evil-join)
   (define-key evil-normal-state-map (kbd "SPC") 'hydra-main/body)
-(define-key evil-normal-state-map (kbd "\\") 'hydra-main/body)
-(define-key evil-visual-state-map (kbd "SPC") 'hydra-main/body)
-(define-key evil-visual-state-map (kbd "\\") 'hydra-main/body)
+  (define-key evil-normal-state-map (kbd "\\") 'hydra-main/body)
+
+  ;; Visual state
+  (define-key evil-visual-state-map (kbd "SPC") 'hydra-main/body)
+  (define-key evil-visual-state-map (kbd "\\") 'hydra-main/body)
 
   ;; Insert state
   (define-key evil-insert-state-map "\C-e" 'move-end-of-line)
   (define-key evil-insert-state-map "\C-a" 'move-begining-of-line))
-
-;; Evil leader
-(when (fboundp 'evil-leader/set-key)
-  (evil-leader/set-key
-    "bD"	'kill-all-buffers-i
-    "bb"	'my-switch-buffer
-    "bd"	'kill-this-buffer
-    "bi"	'open-inbox
-    "bm"	'switch-to-modified-buffer
-    "bs"	'switch-to-scratch
-    "cc"	'comment-dwim
-    "cl"	'comment-line
-    "fe"	'open-init-el
-    "ff"	'my-find-file
-    "fr"	'my-find-recentf
-    "fs"	'save-buffer
-    "fw"	'save-buffer
-    "mm"	'my-mini
-    "pp"	'counsel-projectile
-    "pb"	'counsel-projectile-switch-to-buffer
-    "pd"	'counsel-projectile-find-dir
-    "pf"	'counsel-projectile-find-file
-    "pP"	'counsel-projectile-switch-project
-    "ps"	'counsel-projectile-rg
-    "qq"	'save-buffers-kill-emacs
-    "w SPC"	'ace-window
-    "w-"	'split-window-below
-    "wd"	'delete-window
-    "wn"	'other-window
-    "wo"	'delete-other-windows
-    "ww"	'ace-window
-    "w|"	'split-window-right
-    "yp"	'counsel-yank-pop
-    "qr"        'restart-emacs
-    "=" 'er/expand-region
-
-    ;; Motion
-    "SPC" 'avy-goto-word-1
-    "l" 'avy-goto-line
-    ))
-
-;; Which key
-(when (fboundp 'which-key-add-key-based-replacements)
-  (which-key-add-key-based-replacements
-    "SPC b" "buffer"
-    "SPC c" "comment"
-    "SPC e" "expand"
-    "SPC f" "file"
-    "SPC m" "mode"
-    "SPC p" "projectile"
-    "SPC q" "quit"
-    "SPC t" "treemacs"
-    "SPC w" "window"
-    ))
 
 (pretty-hydra-define font-scale (:hint nil :color amaranth :title (with-random-icon "Font Scale"))
   (""
@@ -278,18 +226,5 @@
 
    "Others"
    (("z" font-scale/body "font scale"))))
-
-
-
-
-;; (defvar prefer-leader 'hydra)
-;; (cond ((eq prefer-leader 'hydra)
-;;        (progn (define-key evil-normal-state-map (kbd "SPC") 'hydra-main/body)
-;; 	      (define-key evil-visual-state-map (kbd "SPC") 'hydra-main/body)))
-;;       ((eq prefer-leader 'evil-leader)
-;;        (evil-leader/set-leader "<SPC>")))
-
-;; (evil-leader/set-leader "<SPC>")
-;; (global-set-key (kbd "<f2>") 'hydra-main/body)
 
 (provide 'init-keybindings)

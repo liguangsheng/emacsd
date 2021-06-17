@@ -1,4 +1,5 @@
 (require 'subr-x)
+(require 'cl-lib)
 
 (defconst user-emacs-lisp-directory
   (expand-file-name "lisp/" user-emacs-directory)
@@ -25,9 +26,6 @@
   (unless (file-executable-p dir) (make-directory dir)))
 
 (make-directory-unless-exists user-emacs-cache-directory)
-
-(defun ucache (filename)
-  (expand-file-name filename user-emacs-cache-directory))
 
 (defun u-site-lisp (filename)
   (expand-file-name filename user-emacs-site-lisp-directory))

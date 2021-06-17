@@ -4,9 +4,9 @@
 
 (use-package smex)
 
-;; (use-package all-the-icons-ivy
-;;   :if prefer-icons
-;;   :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup))
+(use-package all-the-icons-ivy
+  :if prefer-icons
+  :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup))
 
 (use-package all-the-icons-ivy-rich
   :ensure t

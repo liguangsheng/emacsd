@@ -10,12 +10,15 @@
 (setq frame-inhibit-implied-resize t)
 
 ;; Faster to disable these here (before they've been initialized)
-(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(menu-bar-lines . 0) default-frame-alist) 
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
 
-;; 如果用Server模式启动Client，应该在这里设置frame的字体
+;; 最大化Frame
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+(setq-default default-text-properties '(line-spacing 0.25 line-height 1.25))
 
 ;; early-init.el ends here

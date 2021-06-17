@@ -15,24 +15,26 @@
  compilation-always-kill      t
  compilation-ask-about-save   nil
  compilation-scroll-output    t
+ create-lockfiles             nil
+ custom-file                  "~/custom.el"
  debug-on-error               t
  delete-old-versions          t
+ font-lock-maximum-size       5000000
  history-length               1024
  idle-update-delay            0.5
  inhibit-startup-message      t
  kept-new-versions            6
  kept-old-versions            2
  large-file-warning-threshold 100000000
+ tab-width                    4
  vc-follow-symlinks           t
  version-control              t
  visible-bell                 0
- font-lock-maximum-size       5000000
- create-lockfiles             nil
- custom-file                  "~/custom.el"
  )
 
+
 (defalias 'yes-or-no-p 'y-or-n-p)
-(cua-mode 1)
+;; (cua-mode 1)
 (horizontal-scroll-bar-mode -1)
 (global-auto-revert-mode 1)
 (recentf-mode 1)
@@ -46,11 +48,6 @@
 ;; Show line number
 (when show-line-number-p
   (hook-gross-modes #'display-line-numbers-mode))
-
-;; Maximize frame at start
-(defvar maximize-frame-at-start-p t "Maximize-frame-at-start-p.")
-(when maximize-frame-at-start-p (add-to-list 'initial-frame-alist
-					     '(fullscreen . maximized)))
 
 ;; Use utf-8 as default coding system.
 (when (fboundp 'set-charset-priority)
@@ -67,10 +64,5 @@
   (set-next-selection-coding-system 'utf-16-le)
   (set-selection-coding-system 'utf-16-le)
   (set-clipboard-coding-system 'utf-16-le))
-
-;; Set bigger line spacing and vertically-center the text
-(defun set-bigger-spacing ()
-  (setq-local default-text-properties '(line-spacing 0.20 line-height 1.20)))
-(hook-gross-modes #'set-bigger-spacing)
 
 (provide 'init-better-defaults)
