@@ -79,5 +79,5 @@
   :commands (server-running-p server-start)
   :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
 
-(provide 'init-better-defaults)
-;; init-better-defaults.el ends here
+(provide 'init-basic)
+;; init-basic.el ends here

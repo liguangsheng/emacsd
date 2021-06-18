@@ -40,7 +40,7 @@
 ;; -----------------------------------------------------------------------------
 (require 'init-my-functions)
 (require 'init-packages)
-(require 'init-better-defaults)
+(require 'init-basic)
 
 ;; Features
 (require 'init-fonts)
