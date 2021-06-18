@@ -2,6 +2,7 @@
   :init
   (hook-gross-modes #'evil-mode)
   :config
+  (evil-ex-define-cmd "W"    'evil-write)
   (evil-ex-define-cmd "q"    'kill-this-buffer)
   (evil-ex-define-cmd "quit" 'evil-quit))
 

@@ -9,29 +9,30 @@
 
 ;; Better variables
 (setq
- apropos                      t
- backup-by-copying            t
- comint-prompt-read-only      t
- compilation-always-kill      t
- compilation-ask-about-save   nil
- compilation-scroll-output    t
- create-lockfiles             nil
- custom-file                  "~/custom.el"
- debug-on-error               t
- delete-old-versions          t
- font-lock-maximum-size       5000000
- history-length               1024
- idle-update-delay            0.5
- inhibit-startup-message      t
- kept-new-versions            6
- kept-old-versions            2
- large-file-warning-threshold 100000000
- tab-width                    4
- vc-follow-symlinks           t
- version-control              t
- visible-bell                 0
+ apropos                                  t
+ backup-by-copying                        t
+ comint-prompt-read-only                  t
+ compilation-always-kill                  t
+ compilation-ask-about-save               nil
+ compilation-scroll-output                t
+ create-lockfiles                         nil
+ custom-file                              "~/custom.el"
+ debug-on-error                           t
+ delete-old-versions                      t
+ font-lock-maximum-size                   5000000
+ history-length                           1024
+ idle-update-delay                        0.5
+ inhibit-startup-message                  t
+ kept-new-versions                        6
+ kept-old-versions                        2
+ large-file-warning-threshold             100000000
+ tab-width                                4
+ vc-follow-symlinks                       t
+ version-control                          t
+ visible-bell                             0
+ make-backup-files                        nil
+ inhibit-compacting-font-caches           t
  )
-
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 ;; (cua-mode 1)
@@ -44,6 +45,9 @@
 (delete-selection-mode 1)
 (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
 (electric-pair-mode 1)
+
+;; 高亮当前行
+(global-hl-line-mode 1)
 
 ;; Show line number
 (when show-line-number-p
@@ -64,5 +68,10 @@
   (set-next-selection-coding-system 'utf-16-le)
   (set-selection-coding-system 'utf-16-le)
   (set-clipboard-coding-system 'utf-16-le))
+
+(use-package server
+  :ensure nil
+  :commands (server-running-p server-start)
+  :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
 
 (provide 'init-better-defaults)

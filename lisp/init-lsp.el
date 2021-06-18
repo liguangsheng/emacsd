@@ -5,40 +5,41 @@
 ;;; Code:
 (use-package lsp-mode
   :diminish lsp-mode
-  ;; :custom-face
-  ;; (lsp-headerline-breadcrumb-path-error-face
-  ;;  ((t :underline (:style line :color ,(face-foreground 'error))
-  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
-  ;; (lsp-headerline-breadcrumb-path-warning-face
-  ;;  ((t :underline (:style line :color ,(face-foreground 'warning))
-  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
-  ;; (lsp-headerline-breadcrumb-path-info-face
-  ;;  ((t :underline (:style line :color ,(face-foreground 'success))
-  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
-  ;; (lsp-headerline-breadcrumb-path-hint-face
-  ;;  ((t :underline (:style line :color ,(face-foreground 'success))
-  ;;      :inherit lsp-headerline-breadcrumb-path-face)))
+  :custom-face
+  (lsp-headerline-breadcrumb-path-error-face
+   ((t :underline (:style line :color ,(face-foreground 'error))
+       :inherit lsp-headerline-breadcrumb-path-face)))
+  (lsp-headerline-breadcrumb-path-warning-face
+   ((t :underline (:style line :color ,(face-foreground 'warning))
+       :inherit lsp-headerline-breadcrumb-path-face)))
+  (lsp-headerline-breadcrumb-path-info-face
+   ((t :underline (:style line :color ,(face-foreground 'success))
+       :inherit lsp-headerline-breadcrumb-path-face)))
+  (lsp-headerline-breadcrumb-path-hint-face
+   ((t :underline (:style line :color ,(face-foreground 'success))
+       :inherit lsp-headerline-breadcrumb-path-face)))
 
-  ;; (lsp-headerline-breadcrumb-symbols-error-face
-  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
-  ;;      :underline (:style line :color ,(face-foreground 'error)))))
-  ;; (lsp-headerline-breadcrumb-symbols-warning-face
-  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
-  ;;      :underline (:style line :color ,(face-foreground 'warning)))))
-  ;; (lsp-headerline-breadcrumb-symbols-info-face
-  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
-  ;;      :underline (:style line :color ,(face-foreground 'success)))))
-  ;; (lsp-headerline-breadcrumb-symbols-hint-face
-  ;;  ((t :inherit lsp-headerline-breadcrumb-symbols-face
-  ;;      :underline (:style line :color ,(face-foreground 'success)))))
+  (lsp-headerline-breadcrumb-symbols-error-face
+   ((t :inherit lsp-headerline-breadcrumb-symbols-face
+       :underline (:style line :color ,(face-foreground 'error)))))
+  (lsp-headerline-breadcrumb-symbols-warning-face
+   ((t :inherit lsp-headerline-breadcrumb-symbols-face
+       :underline (:style line :color ,(face-foreground 'warning)))))
+  (lsp-headerline-breadcrumb-symbols-info-face
+   ((t :inherit lsp-headerline-breadcrumb-symbols-face
+       :underline (:style line :color ,(face-foreground 'success)))))
+  (lsp-headerline-breadcrumb-symbols-hint-face
+   ((t :inherit lsp-headerline-breadcrumb-symbols-face
+       :underline (:style line :color ,(face-foreground 'success)))))
 
   :hook ((lsp-mode . (lambda ()
 		       ;; Integrate `which-key'
 		       (lsp-enable-which-key-integration)
 
 		       ;; Format and organize imports
-		       ;; (add-hook 'before-save-hook #'lsp-format-buffer t t)
-		       (add-hook 'before-save-hook #'lsp-organize-imports t t))))
+		       (add-hook 'before-save-hook #'lsp-format-buffer t t)
+		       (add-hook 'before-save-hook #'lsp-organize-imports t t)))
+	 (lsp-managed-mode-hook . 'lsp-diagnostics-modeline-mode))
 
   :bind (:map lsp-mode-map
 	      ("C-c C-d" . lsp-describe-thing-at-point)
@@ -66,6 +67,7 @@
 	lsp-enable-text-document-color nil
 	lsp-enable-indentation nil
 	lsp-enable-on-type-formatting nil
+	lsp-diagnostics-modeline-scope :project
 	)
 
   :config
@@ -76,12 +78,7 @@
     (interactive)
     (lsp-restart-workspace)
     (revert-buffer t t)
-    (message "LSP server restarted."))
-
-  (with-eval-after-load 'lsp-mode
-    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
-    (setq lsp-diagnostics-modeline-scope :project)
-    (add-hook 'lsp-managed-mode-hook 'lsp-diagnostics-modeline-mode)))
+    (message "LSP server restarted.")))
 
 (with-eval-after-load 'treemacs
   (use-package lsp-treemacs))

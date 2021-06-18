@@ -1,51 +1,13 @@
-(defvar default-font-size 12) (defvar prefer-fonts '((
-						      :if (eq system-type 'windows-nt)
-						      :font-name "Source Code Pro for Powerline"
-						      :font-size 14
-						      :chinese-font-name "WenQuanYi Micro Hei"
-						      :chinese-font-size 14
-						      )
-						     (
-						      :if (eq system-stype 'windows-nt)
-						      :font-name "Consolas"
-						      :font-size 14
-						      :chinese-font-name "Microsoft YaHei UI"
-						      :chinese-font-size 14)
-						     ))
-
-(defun font-exists-p (font-name)
-  "Check if font exists."
-  (not (null (x-list-fonts font-name))))
-
-(defun use-font (&rest args)
-  "Set font"
-  (unless (and (plist-member args :if) (not (plist-get args :if))) 
-    (let* ((en-font-name (plist-get args :font-name))
-	   (en-font-size (or (plist-get args :font-size) default-font-size))
-	   (cn-font-name (plist-get args :chinese-font-name))
-	   (cn-font-size (or (plist-get args :chinese-font-size) default-font-size)))
-      (and
-       (if en-font-name (when (font-exists-p en-font-name)
-       			  (set-face-attribute 'default nil
-       					      :font (format "%s:pixelsize=%d" en-font-name en-font-size)
-       					      :weight 'normal) t) t)
-
-       (if cn-font-name (when (font-exists-p cn-font-name)
-			  (dolist (charset '(kana han symbol cjk-misc bopomofo))
-			    (set-fontset-font (frame-parameter nil 'font) charset
-					      (font-spec :family cn-font-name :size cn-font-size))) t) t)
-       ))))
-
-(defun use-font-fallback (font-list)
-  "Set fonts fallback"
-  (catch 'finish
-    (dolist (font font-list)
-      (print font)
-      (if (apply 'use-font font) (throw 'finish t)))))
-
+;; Font Example:
 ;; 春眠不觉晓，处处闻啼鸟
 ;; abcdefghijklmnopqrstuvwxyz
 ;; ABCDEFGHIJKLMNOPQRSTUVWXYZ
+;; 0123456789
+
+(defun font-installed-p (font-name)
+  "Check if font with FONT-NAME is available."
+  (find-font (font-spec :name font-name)))
+
 ;; (use-font
 ;;  :font-name "Go Mono for Powerline"
 ;;  :font-size 12
@@ -53,12 +15,45 @@
 ;;  :chinese-font-size 12
 ;;  )
 
+(setq-default cjk-charsets '(kana han symbol cjk-misc bopomofo)
+	      cn-fonts `(,(font-spec :family "WenQuanYi Micro Hei" :height 90)
+			 ,(font-spec :family "Microsoft Yahei" :height 90))
+	      en-fonts '("Droid Sans Mono:size=14"
+			 "Menlo:size=14"
+			 "Monoco:size=14"
+			 "Consolas:size=14"
+			 "Courier New:size=14"
+			 "monospace:size=14"))
+
+
+(defvar prefer-en-font nil)
+(when (or (stringp prefer-en-font) (fontp prefer-en-font)) (push prefer-en-font en-fonts))
+(defvar prefer-cn-font nil)
+(when (or (stringp prefer-cn-font) (fontp prefer-cn-font)) (push prefer-cn-font cn-fonts))
+
 (defun reset-font ()
   (interactive)
-  (use-font-fallback prefer-fonts))
+  ;; 设置unicode字体
+  (cl-loop for font in '("Apple Color Emoji" "Segoe UI Symbol" "Symbola" "Symbol")
+           when (font-installed-p font)
+           return(set-fontset-font t 'unicode font nil 'prepend))
+
+  ;; 设置英文字体
+  (cl-loop for font in en-fonts
+	   when (font-installed-p font)
+	   return (set-frame-font font))
+
+  ;; 设置中文字体
+  (cl-loop for font in cn-fonts
+	   do (cl-loop for charset in cjk-charsets
+		       do (set-fontset-font t charset font)))
+  )
 
 (when (display-graphic-p)
-  (add-hook 'after-init-hook (lambda () (use-font-fallback prefer-fonts))))
+  (add-hook 'after-init-hook 'reset-font)
+  (add-hook 'minibuffer-setup-hook (lambda ()  (set (make-local-variable 'face-remapping-alist)
+						    '((default :height 0.9)))))
+  )
 
 (provide 'init-fonts)
 

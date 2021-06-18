@@ -19,6 +19,7 @@
 ;; 最大化Frame
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
-(setq-default default-text-properties '(line-spacing 0.25 line-height 1.25))
+;; 设置字体
+(setq-default default-text-properties '(line-spacing 0.0 line-height 19))
 
 ;; early-init.el ends here

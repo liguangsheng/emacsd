@@ -1,4 +1,3 @@
-
 (when use-tabnine
   (use-package company-tabnine))
 

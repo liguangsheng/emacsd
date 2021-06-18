@@ -10,6 +10,8 @@
 (use-package firecode-theme :defer t)
 (use-package moe-theme :defer t)
 (use-package kaolin-themes :defer t)
+(use-package solo-jazz-theme :defer t)
+(use-package jazz-theme :defer t)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/solo-jazz-emacs-theme")
 
