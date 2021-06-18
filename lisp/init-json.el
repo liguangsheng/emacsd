@@ -3,6 +3,7 @@
 ;;; Code:
 
 (use-package json-mode
-  :mode (("\\.json\\'" . json-mode)))
+  :mode (("\\.json\\'" . json-mode))
+  :hook (json-mode . lsp-deferred))
 
 (provide 'init-json)

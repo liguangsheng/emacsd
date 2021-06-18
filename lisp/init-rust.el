@@ -8,7 +8,7 @@
   (setq rust-format-on-save t
 	lsp-rust-server 'rust-analyzer)
   (defun rust-mode-hook-func ()
-    (require 'lsp-rust)
+    (lsp-deferred)
     (when use-tabnine
       (add-to-list 'company-backends #'company-tabnine))))
 
