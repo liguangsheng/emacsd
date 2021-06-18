@@ -13,21 +13,19 @@
 (setq-default
  ;; 显示行号
  show-line-number-p t
- ;; Prefer fonts
+ ;; 字体偏好
  ;; https://github.com/powerline/fonts
  ;; curl -L https://github.com/hbin/top-programming-fonts/raw/master/install.sh | bash
- prefer-en-font "Go Mono for Powerline:size=14"
-
+ prefer-en-font "Go Mono for Powerline:size=12"
  ;; Proxy
  ;; url-proxy-services '(("http"  . "127.0.0.1:1080")
  ;; 		         ("https" . "127.0.0.1:1080")))
  use-tabnine *i-am-rich*
- ;; use posframe if possible
+ ;; 尽量使用posframe
  prefer-posframe nil
- ;; use all-the-icons if possible
+ ;; 尽量使用图标
  prefer-icons (display-graphic-p)
  ;; 加载主题，如果存在的话
- ;; 推荐: 白天用'solo-jazz, 夜间用'wombat
  prefer-theme 'doom-dark+
  ;; python 可执行文件地址
  my/python-executable "python3"
@@ -37,8 +35,7 @@
 
 (when *win64*
   (setq org-directory "e:/sync/org/"
-	my/python-executable "C:\\Program Files\\Python39\\python.exe"
-	))
+	my/python-executable "C:\\Program Files\\Python39\\python.exe"))
 
 ;; -----------------------------------------------------------------------------
 (require 'init-my-functions)

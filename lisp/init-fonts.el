@@ -51,9 +51,8 @@
 
 (when (display-graphic-p)
   (add-hook 'after-init-hook 'reset-font)
-  (add-hook 'minibuffer-setup-hook (lambda ()  (set (make-local-variable 'face-remapping-alist)
-						    '((default :height 0.9)))))
-  )
+  (add-hook 'minibuffer-setup-hook
+	    (lambda ()  (set (make-local-variable 'face-remapping-alist) '((default :height 90))))))
 
 (provide 'init-fonts)
 

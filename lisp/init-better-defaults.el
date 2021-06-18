@@ -49,9 +49,14 @@
 ;; 高亮当前行
 (global-hl-line-mode 1)
 
-;; Show line number
+;; 显示行号
 (when show-line-number-p
   (hook-gross-modes #'display-line-numbers-mode))
+
+;; 全局开启折行模式
+(set-default 'truncate-lines t)
+(setq-default truncate-partial-width-windows nil)
+(global-visual-line-mode t)
 
 ;; Use utf-8 as default coding system.
 (when (fboundp 'set-charset-priority)
@@ -75,3 +80,4 @@
   :hook (after-init . (lambda () (unless (server-running-p) (server-start)))))
 
 (provide 'init-better-defaults)
+;; init-better-defaults.el ends here
