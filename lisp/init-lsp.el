@@ -37,9 +37,10 @@
 		       (lsp-enable-which-key-integration)
 
 		       ;; Format and organize imports
-		       (add-hook 'before-save-hook #'lsp-format-buffer t t)
-		       (add-hook 'before-save-hook #'lsp-organize-imports t t)))
-	 (lsp-managed-mode-hook . 'lsp-diagnostics-modeline-mode))
+		      ;;  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+		      ;;  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+           ))
+	      (lsp-managed-mode-hook . 'lsp-diagnostics-modeline-mode))
 
   :bind (:map lsp-mode-map
 	      ("C-c C-d" . lsp-describe-thing-at-point)

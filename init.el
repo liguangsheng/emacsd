@@ -27,15 +27,17 @@
  prefer-icons (display-graphic-p)
  ;; 加载主题，如果存在的话
  prefer-theme 'doom-dark+
- ;; python 可执行文件地址
- my/python-executable "python3"
  ;; org files directory
  org-directory "~/sync/org"
+
+ ;; python 可执行文件地址
+ python-shell-interpreter "python3"
  )
 
 (when *win64*
   (setq org-directory "e:/sync/org/"
-	my/python-executable "C:\\Program Files\\Python39\\python.exe"))
+	python-shell-interpreter "C:\\Program Files\\Python39\\python.exe"
+	))
 
 ;; -----------------------------------------------------------------------------
 (require 'init-my-functions)
@@ -45,6 +47,7 @@
 ;; Features
 (require 'init-fonts)
 (require 'init-themes)
+(require 'init-treemacs)
 (require 'init-icons)
 (require 'init-evil)
 (require 'init-hydra)
@@ -56,7 +59,6 @@
 (require 'init-tabnine)
 (require 'init-projectile)
 (require 'init-flycheck)
-(require 'init-treemacs)
 (require 'init-which-key)
 (require 'init-modeline)
 (require 'init-lsp)

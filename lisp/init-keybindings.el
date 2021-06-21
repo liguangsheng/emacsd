@@ -5,7 +5,7 @@
 ;;; Code:
 
 (with-eval-after-load 'hydra
-  (pretty-hydra-define hydra-launcher (:color teal :title (with-fileicon "emacs" "Overview"))
+  (pretty-hydra-define hydra-launcher (:color teal :title "Overview")
     ("Groups"
      (("b"    hydra-buffers/body   "+ buffers")
       ("c"    hydra-comments/body  "+ comment")

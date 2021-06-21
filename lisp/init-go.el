@@ -4,7 +4,8 @@
 
 (use-package go-mode
   :mode "\\.go\\'"
-  :hook (go-mode . go-mode-hook-func)
+  :hook ((go-mode . go-mode-hook-func))
+
   :bind (:map go-mode-map
 	      ("C-c d d" . godef-describe)
 	      ("C-c d p" . godoc-at-point)
@@ -18,16 +19,13 @@
 	(exec-path-from-shell-copy-env var))))
 
   (defun go-mode-hook-func ()
-    ;; Prefer "goreturns" as format tool
-    ;; (when (executable-find "goreturns")
-    ;;   (setq gofmt-command "goreturns"))
-
-    ;; Eyes and hands comfort
-    (subword-mode 1)
     (setq tab-width 4
 	  indent-tabs-mode 1)
+    (subword-mode 1)
     (lsp-deferred)
-    ))
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  )
 
 (use-package flycheck-golangci-lint
   :if (executable-find "golangci-lint")

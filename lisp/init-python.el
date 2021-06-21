@@ -5,8 +5,6 @@
 
 (use-package python-mode
   :init
-  (when (executable-find "python3")
-    (setq python-shell-interpreter my/python-executable))
   (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
 
   :hook (python-mode .(lambda ()
