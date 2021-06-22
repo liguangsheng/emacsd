@@ -97,4 +97,8 @@
          ([M-f3] . symbol-overlay-remove-all))
   )
 
+;; 将buffer中#000000样式的16进制rgb渲染出染色
+;; 需要的时候手动开启M-x rainbow-mode
+(use-package rainbow-mode)
+
 (provide 'init-features)

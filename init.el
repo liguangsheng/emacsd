@@ -26,10 +26,9 @@
  ;; 尽量使用图标
  prefer-icons (display-graphic-p)
  ;; 加载主题，如果存在的话
- prefer-theme 'doom-dark+
+ prefer-theme 'lgs-dark
  ;; org files directory
  org-directory "~/sync/org"
-
  ;; python 可执行文件地址
  python-shell-interpreter "python3"
  )
@@ -82,6 +81,7 @@
 (require 'init-toml)
 (require 'init-powershell)
 (require 'init-graphql)
+(require 'init-groovy)
 
 ;; Load custom file
 (when (and custom-file (file-readable-p custom-file) (load custom-file)))
